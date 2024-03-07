@@ -1,0 +1,38 @@
+
+    {% block head %}
+        {% include "head.html" %}
+    {% endblock %}
+
+<body>
+    <header>
+       <h1>LXC Web Lynx</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Monitoramento</a></li>
+                <li><a href="#">Configurações</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="content">
+        <div class="widget">
+            <h2>Atividade Recente</h2>
+            <p>Insira aqui informações sobre atividades recentes...</p>
+        </div>
+        <div class="widget">
+            <h2>Alertas</h2>
+            <p>Insira aqui informações sobre alertas...</p>
+        </div>
+        <div class="widget">
+            <h2>Gráficos</h2>
+            <p>Insira aqui gráficos e estatísticas...</p>
+        </div>
+    </section>
+
+
+    {% block footer %}
+        {% include "footer.html" %}
+    {% endblock %}
+
+</body>
