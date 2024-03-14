@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
-from home.views import index
+from home.views import base
 
 
 def registro_view(request):
@@ -11,10 +11,10 @@ def registro_view(request):
             user = form.save()
             login(request, user)
             logout(request)
-            return redirect('login')  # Redirecionar para a página inicial após o registro
+            return redirect('login')  # Redirecionar para a página de login após o registro
     else:
         form = UserCreationForm()
-    return render(request, 'registro.html', {'form': form})
+    return render(request, 'contas/registro.html', {'form': form})
 
 
 def login_view(request):
@@ -23,12 +23,12 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect(index)  # Redirecionar para a página inicial após o login
+            return redirect(base)  # Redirecionar para a página inicial após o login
     else:
         form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'contas/login.html', {'form': form})
 
 
 def logout_view(request):
     logout(request)
-    return redirect(index)  # Redirecionar para a página de login após o logout
+    return redirect('login')  # Redirecionar para a página de login após o logout
