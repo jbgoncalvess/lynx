@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'bootstrap5',
 ]
 
-INSTALLED_APPS += ['home', 'contas', ]
+INSTALLED_APPS += ['apps.home', 'apps.contas', ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
