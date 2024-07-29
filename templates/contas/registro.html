@@ -1,7 +1,5 @@
-  {% load static %}
-  {% load bootstrap5 %}
-  {% bootstrap_css %}
-  {% bootstrap_javascript %}
+{% load static %}
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -9,26 +7,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lynx Registro</title>
+  <!-- MDB CSS (opcional, se estiver utilizando MDBootstrap) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet">
+  <!-- Link para o CSS personalizado -->
+  <link href="{% static 'contas/registro.css' %}" rel="stylesheet">
 </head>
 <body>
-<section class="vh-100 gradient-custom-2">
+<section class="h-100 gradient-form">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-        <div class="card bg-dark text-white" style="border-radius: 1rem;">
-          <div class="card-body p-5">
-            <div class="text-center">
-              <img src="{% static 'figuras/teste.png' %}" width="200" height="200" alt="">
-              <h4 class="mt-1 mb-5 pb-1">Registre-se no Lynx</h4>
+      <div class="col-xl-10">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-lg-6">
+              <div class="card-body p-md-5 mx-md-4">
+                <div class="text-center">
+                  <img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="250px" alt="">
+                </div>
+                <form>
+                  <p>Crie uma nova conta</p>
+                  <div class="form-outline mb-4">
+                    <input type="text" id="form2Example11" class="form-control"
+                      placeholder="Nome completo" />
+                    <label class="form-label" for="form2Example11">Nome</label>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input type="password" id="form2Example21" class="form-control" />
+                    <label class="form-label" for="form2Example21">Senha</label>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input type="password" id="form2Example22" class="form-control" />
+                    <label class="form-label" for="form2Example22">Confirme a Senha</label>
+                  </div>
+                  <div class="text-center pt-1 mb-5 pb-1">
+                    <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="button">Registrar</button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-center pb-4">
+                    <p class="mb-0 me-2">Já tem uma conta?</p>
+                    <a class="btn btn-outline-primary" href="{% url 'login' %}">Faça login</a>
+                  </div>
+                </form>
+              </div>
             </div>
-            <form method="post" class="registration-form text-center">
-              {% csrf_token %}
-              {{ form.as_p }}
-              <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Registrar</button>
-            </form>
+            <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+              <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                <h4 class="mb-4">Bem-vindo à nossa plataforma</h4>
+                <p class="small mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                  exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- MDB JS (opcional, se estiver utilizando MDBootstrap) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+</body>
+</html>

@@ -1,29 +1,20 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
-from apps.home.views import base
-
-
-def registro_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            logout(request)
-            return redirect('login')  # Redirecionar para a página de login após o registro
-    else:
-        form = UserCreationForm()
-    return render(request, 'contas/registro.html', {'form': form})
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = AuthenticationForm(request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect(base)  # Redirecionar para a página inicial após o login
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('/')
+            else:
+                form.add_error(None, 'Usuário ou senha inválidos')
     else:
         form = AuthenticationForm()
     return render(request, 'contas/login.html', {'form': form})
@@ -31,4 +22,19 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')  # Redirecionar para a página de login após o logout
+    return redirect('login')
+
+
+def registro_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(request, username=username, password=password)
+            login(request, user)
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'contas/registro.html', {'form': form})

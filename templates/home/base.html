@@ -1,68 +1,91 @@
+{% load static %}
+
+{# Head #}
 <!DOCTYPE html>
 <html lang="pt-br">
-    {% load static %}
-    {% block head %}
-        {% include "home\head.html" %}
-    {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDB Sidebar Example</title>
+    <!-- MDB CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet">
+    <!-- CSS personalizado -->
+    <link href="{% static 'home/base.css' %}" rel="stylesheet">
+</head>
+
+{# Body #}
 <body>
-<main>
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
-        <a href="/" class="d-flex align-items-center justify-content-center">
-            <img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="210" height="70" alt="">
-            {# <span class="fs-4">LXC Web Lynx</span> #}
-        </a>
-        <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-            {# <li class="nav-item">#}
-            {#     <a href="#" class="nav-link text-white" aria-current="page">#}
-            {#         <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>#}
-            {#         Home#}
-            {#     </a>#}
-            {# </li>#}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white" style="width: 250px; height: 100vh;">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="210" height="70" alt="">
+            </a>
+        <ul class="nav nav-pills flex-column mb-auto ">
+            <li class="nav-item">
+                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                    <i class="fas fa-home "></i>
+                    Home
+                </a>
+            </li>
             <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer"/></svg>
+                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                    <i class="fas fa-tachometer-alt me-2"></i>
                     Dashboard
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#containers"/></svg>
+                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                    <i class="fas fa-box me-2"></i>
                     Containers
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#imagens"/></svg>
+                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                    <i class="fas fa-image me-2"></i>
                     Imagens
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#balanceamento"/></svg>
-                    Balanceamento de Carga
+                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                    <i class="fas fa-server me-2"></i>
+                    Balanceamento
                 </a>
             </li>
         </ul>
-        <hr>
-        <div class="dropdown" style="z-index: 2">
-            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <svg class="bi me-2" width="32" height="32"><use xlink:href="#usuário"/></svg>
-                <strong>{{ user.username }}</strong>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
-            </ul>
-
+            <div class="dropdown mt-auto">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-mdb-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user me-2"></i>
+                    <strong>{{ user.username }}</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+                </ul>
+            </div>
         </div>
+    </aside>
 
-    </div>
-</main>
-        {% block footer %}
-                {% include "home\footer.html" %}
-        {% endblock %}
+    <!-- Main content -->
+    <main class="content">
+        <div class="container">
+            <h1>Bem-vindo à PÁGINA Home</h1>
+        </div>
+    </main>
+
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+    <!-- FontAwesome (para os ícones) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+
+
+{# Footer #}
+    <footer class="footer content bg-dark text-white">
+      <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
+    </footer>
+
 </body>
 </html>
