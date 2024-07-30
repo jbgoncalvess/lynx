@@ -1,0 +1,65 @@
+/* CSS personalizado */
+
+/* Mantém o gradiente de fundo igual ao do login */
+.gradient-custom-2 {
+  background: #fccb90;
+  background: -webkit-linear-gradient(to right, #0033ff, #3366ff, #3399ff, #66aaff);
+  background: linear-gradient(to right, #0033ff, #3366ff, #3399ff, #66aaff);
+}
+
+@media (min-width: 768px) {
+  .gradient-form {
+    height: 100vh !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .gradient-custom-2 {
+    border-top-right-radius: .3rem;
+    border-bottom-right-radius: .3rem;
+  }
+}
+
+body {
+  background-color: #343333;
+}
+
+.card {
+  background-color: #414040;
+  color: white;
+}
+
+.form-label {
+  color: #bbb;
+}
+
+.form-control {
+  background-color: #3a3a3a;
+  border: 1px solid #555;
+  color: #ddd;
+}
+
+.btn-primary {
+  background: linear-gradient(to right, #0033ff, #3366ff, #3399ff, #66aaff);
+  border: none;
+}
+
+.btn-outline-primary {
+  border-color: #0c0c0c;
+  color: #0c0c0c;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0033ff;
+  color: #ffffff;
+}
+
+.btn-outline-danger {
+  border-color: #dc0000;
+  color: #dc0000;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc0000;
+  color: #ffffff;
+}
