@@ -6,9 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDB Sidebar Example</title>
+    <title>Lynx</title>
     <!-- MDB CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet">
+    <link href="{% static 'mdbootstrap/mdb.min.css' %}" rel="stylesheet">
     <!-- CSS personalizado -->
     <link href="{% static 'home/base.css' %}" rel="stylesheet">
 </head>
@@ -24,7 +24,7 @@
         <ul class="nav nav-pills flex-column mb-auto ">
             <li class="nav-item">
                 <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-home "></i>
+                    <i class="fas fa-home me-2"></i>
                     Home
                 </a>
             </li>
@@ -55,7 +55,7 @@
         </ul>
             <div class="dropdown mt-auto">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-mdb-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user me-2"></i>
+                    <i class="fa-solid fa-circle-user me-2"></i>
                     <strong>{{ user.username }}</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
@@ -76,11 +76,9 @@
     </main>
 
     <!-- MDB JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+    <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-
+    <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
 
 {# Footer #}
     <footer class="footer content bg-dark text-white">
