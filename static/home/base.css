@@ -1,29 +1,32 @@
 /* CSS */
 .sidebar {
-  width: 200px; /* largura da sidebar */
-  height: 100vh; /* altura da sidebar */
-  background-color: #f0f0f0; /* cor de fundo da sidebar */
   position: fixed; /* fixa a sidebar na lateral esquerda */
   top: 0;
   left: 0;
+  z-index: 1;
 }
 
+/*Espaçamento pra sidebar*/
 .content {
-  margin-left: 200px; /* espaçamento à esquerda para dar lugar à sidebar */
+  margin-left: 250px; /* espaçamento à esquerda para dar lugar à sidebar */
+  padding-bottom: 60px; /* Adiciona espaço no fundo para o footer */
 }
 
+/*Onde eu escrevo o conteúdo de cada App*/
 .container {
-  width: calc(100% - 200px); /* largura do container é a largura da tela menos a largura da sidebar */
-  margin: 0 auto; /* centraliza o container */
-  text-align: center; /* centraliza o texto horizontalmente */
-  padding: 20px; /* espaçamento interno */
+  width: 100%;
+  padding: 15px; /* espaçamento interno */
 }
 
 .footer {
-  width: calc(100% - 200px);
+  width: 100%;
   text-align: center;
   padding: 10px;
-  z-index: 1;
-  position: absolute;
+  position: fixed;
   bottom: 0;
+}
+
+/*Arruma a escrita do footer*/
+.footer p {
+  margin: 0;
 }

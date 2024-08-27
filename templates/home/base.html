@@ -71,9 +71,17 @@
     <!-- Main content -->
     <main class="content">
         <div class="container">
-            <h1>Bem-vindo à PÁGINA Home</h1>
+            <h1 class="text-center bg-primary text-white p-2 rounded">Bem-vindo, {{ user.username }}!</h1>
+            <p class="bg-info text-white p-2 rounded">É um prazer tê-lo de volta, {{ user.username }}. Aqui estão algumas atualizações rápidas:</p>
+            <ul class="bg-secondary rounded text-black">
+                <li class=" p-1 ">Total de containers ativos: X</li>
+                <li class=" p-1 ">Última vez que você acessou: {{ user.last_login|date:"d/m/Y H:i" }}</li>
+                <li class=" p-1 ">Novo conteúdo no dashboard!</li>
+            </ul>
+            <p class="bg-info text-white p-2 rounded">Aproveite para navegar pelos recursos disponíveis no sistema e gerenciar seus servidores de forma rápida e eficiente!</p>
         </div>
     </main>
+
 
     <!-- MDB JS -->
     <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
@@ -81,7 +89,7 @@
     <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
 
 {# Footer #}
-    <footer class="footer content bg-dark text-white">
+    <footer class="footer bg-dark text-white">
       <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
 
