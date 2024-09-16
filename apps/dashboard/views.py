@@ -3,6 +3,5 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def base(request):
-    return render(request, 'home/base.html')
-
+def dashboard_view(request):
+    return render(request, 'dashboard/dashboard.html')

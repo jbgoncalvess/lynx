@@ -24,7 +24,9 @@ SECRET_KEY = 'django-insecure-2e_0##z^*g_f8^(=h=8)4!$76v5^klp1zkw6l)8$rl&9*!-$qp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Necessário adicionar o endereço IP do servidor que estará sendo monitorado, já que ele
+# deve enviar dados pro software
+ALLOWED_HOSTS = ['192.168.2.156', '127.0.0.1', '192.168.2.135']
 
 # Application definition
 
@@ -35,10 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'bootstrap5',
 ]
 
-INSTALLED_APPS += ['apps.home', 'apps.contas', ]
+INSTALLED_APPS += ['apps.home', 'apps.contas', 'apps.containers', 'apps.dashboard', ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
