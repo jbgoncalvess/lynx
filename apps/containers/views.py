@@ -10,7 +10,7 @@ import json
 def containers_view(request):
     # Passar o último valor que tenho no banco, ou seja, ultima atualização
     last_status = ContainerStatus.objects.order_by('-hora').first()
-    # Enviar para o template html essa atualização, não mandar direto do banco
+    # Enviar para o container.html essa atualização, não mandar direto do banco
     return render(request, 'containers/containers.html', {'last_status': last_status})
 
 
