@@ -74,12 +74,9 @@
             <h1 class="text-center bg-primary text-white p-2 rounded">CONTAINERS</h1>
             <p class="bg-info text-white p-2 rounded">testandooo:</p>
             <ul class="bg-secondary rounded text-black">
-                <li class=" p-1 ">Total de containers ativos:</li>
-                <h1>Último Status do Container</h1>
-
                 {% if last_status %}
-                    <p><strong>Número de Containers Ativos:</strong> {{ last_status.container_count }}</p>
-                    <p><strong>Data e Hora:</strong> {{ last_status.hora }}</p>
+                    <li class=" p-1 ">Total de containers ativos: {{ last_status.container_count }} </li>
+                    <li class=" p-1 ">Data e Hora: {{ last_status.hora }} </li>
                 {% else %}
                     <p>Não há dados disponíveis.</p>
                 {% endif %}
