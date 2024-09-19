@@ -22,5 +22,6 @@ urlpatterns = [
     path('', include('apps.home.urls')),
     path('', include('apps.contas.urls')),
     path('', include('apps.containers.urls')),
-    path('', include('apps.dashboard.urls'))
+    path('', include('apps.dashboard.urls')),
+    path('', include('apps.api.urls'))
 ]

@@ -11,6 +11,8 @@
     <link href="{% static 'mdbootstrap/mdb.min.css' %}" rel="stylesheet">
     <!-- CSS personalizado -->
     <link href="{% static 'home/base.css' %}" rel="stylesheet">
+    <!-- Gráficos chart -->
+    <script src="{% static 'mdbootstrap/chart.js' %}"></script>
 </head>
 
 {# Body #}
@@ -74,11 +76,26 @@
             <h1 class="text-center bg-primary text-white p-1 rounded">
                 <i class="fas fa-tachometer-alt me-2"></i> DASHBOARD</h1>
             <ul class="bg-secondary rounded text-black">
-                <li class=" p-1 ">Total de containers ativos: X</li>
-                <li class=" p-1 ">Última vez que você acessou: {{ user.last_login|date:"d/m/Y H:i" }}</li>
-                <li class=" p-1 ">Novo conteúdo no dashboard!</li>
+                {% if ult_reg %}
+                    <li class=" p-1 ">Total de containers ativos: {{ ult_reg.container_count }} </li>
+                    <li class=" p-1 ">Data e Hora: {{ ult_reg.hora }} </li>
+                {% else %}
+                    <p>Não há dados disponíveis.</p>
+                {% endif %}
             </ul>
-            <p class="bg-info text-white p-2 rounded">Aproveite para navegar pelos recursos disponíveis no sistema e gerenciar seus servidores de forma rápida e eficiente!</p>
+
+            <i class="bg-primary text-white p-2 rounded text-center mb-lg-n2">Máximo de containers por dia</i>
+
+            <!-- Adicionar gráfico -->
+            <canvas class="w-100 border-5 rounded p-2 border-primary" id="myChart" height="280" style="border:solid;"></canvas>
+
+            <!-- Adicionar dados para o gráfico -->
+            <script id="chart-data" type="application/json">
+                {{ container_counts|escapejs }}
+            </script>
+            <!-- Adiciona o gráfico -->
+            <script src="{% static 'graficos/grafico.js' %}"></script>
+
         </div>
     </main>
 
