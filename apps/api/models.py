@@ -16,10 +16,19 @@ class ContainerStatus(models.Model):
 
 # Model para armazenar os valores máximos por data
 class DailyMax(models.Model):
-    # Campo para armazenar a data do registro
     date = models.DateField(unique=True)
     max_containers = models.IntegerField(default=0)
     time = models.DateTimeField(default=timezone.localtime)
 
     def __str__(self):
         return f"{self.date}: {self.max_containers} containers"
+
+
+# Model para armazenar os valores mínimos por data
+class DailyMin(models.Model):
+    date = models.DateField(unique=True)
+    min_containers = models.IntegerField(default=0)
+    time = models.DateTimeField(default=timezone.localtime)
+
+    def __str__(self):
+        return f"{self.date}: {self.min_containers} containers"

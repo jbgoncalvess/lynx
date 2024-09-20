@@ -11,11 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
       labels: data.dates,
       datasets: [
         {
-          data: data.max_container_counts,
+          label: 'Mínimo de Containers',
+          data: data.min_container_counts,  // Dados de contêineres mínimos
+          lineTension: 0,
+          backgroundColor: "transparent",
+          borderColor: "#ff0000",  // Cor da linha para o mínimo
+          borderWidth: 2,
+          pointBackgroundColor: "#ff0000",
+        },
+        {
+          label: 'Máximo de Containers',
+          data: data.max_container_counts,  // Dados de contêineres máximos
           lineTension: 0,
           backgroundColor: "transparent",
           borderColor: "#007bff",
-          borderWidth: 5,
+          borderWidth: 3,
           pointBackgroundColor: "#007bff",
         },
       ],

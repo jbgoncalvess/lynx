@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import ContainerStatus, DailyMax
+from .models import ContainerStatus, DailyMax, DailyMin
 from django.utils import timezone
 import json
 
@@ -41,7 +41,17 @@ def info_containers(request):
                     existing_entry.save()
             else:
                 # Se não houver um registro, cria um novo
-                DailyMax.objects.create(date=current_date, max_containers=6)
+                DailyMax.objects.create(date=current_date, max_containers=container_count)
+
+            existing_entry = DailyMin.objects.filter(date=current_date).first()
+            if existing_entry:
+                if container_count < existing_entry.min_containers:
+                    existing_entry.min_containers = container_count
+                    existing_entry.save()
+            else:
+                DailyMin.objects.create(date=current_date, min_containers=container_count)
+
+
 
             # Verifica se há mais de 90 registros no total (3 meses tá bom de histórico)
             if DailyMax.objects.count() > 90:
