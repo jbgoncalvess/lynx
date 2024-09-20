@@ -78,7 +78,7 @@
             <ul class="bg-secondary rounded text-black">
                 {% if ult_reg %}
                     <li class=" p-1 ">Total de containers ativos: {{ ult_reg.container_count }} </li>
-                    <li class=" p-1 ">Data e Hora: {{ ult_reg.hora }} </li>
+                    <li class=" p-1 ">Data e Hora: {{ ult_reg.time }} </li>
                 {% else %}
                     <p>Não há dados disponíveis.</p>
                 {% endif %}
@@ -89,10 +89,14 @@
             <!-- Adicionar gráfico -->
             <canvas class="w-100 border-5 rounded p-2 border-primary" id="myChart" height="280" style="border:solid;"></canvas>
 
-            <!-- Adicionar dados para o gráfico -->
+            <!-- Passar dados para o gráfico -->
             <script id="chart-data" type="application/json">
-                {{ container_counts|escapejs }}
+                {
+                    "max_container_counts": {{ max_container_counts|safe }},
+                    "dates": {{ dates|safe }}
+                }
             </script>
+
             <!-- Adiciona o gráfico -->
             <script src="{% static 'graficos/grafico.js' %}"></script>
 

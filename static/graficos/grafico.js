@@ -3,24 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Receber os dados transformados do HTML, que por sua vez recebeu da View
   const chartData = document.getElementById('chart-data');
   const data = JSON.parse(chartData.textContent);
-
   const ctx = document.getElementById("myChart");
 
   const myChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: [
-        "Segunda",
-        "Terça",
-        "Quarta",
-        "Quinta",
-        "Sexta",
-        "Sábado",
-        "Domingo",
-      ],
+      labels: data.dates,
       datasets: [
         {
-          data: data,
+          data: data.max_container_counts,
           lineTension: 0,
           backgroundColor: "transparent",
           borderColor: "#007bff",
