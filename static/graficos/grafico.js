@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             color: "rgba(14,14,14,0.7)",
           },
           ticks: {
-            color: "rgb(14,14,14)",
+            color: "rgba(14,14,14,0.7)",
             // stepSize: 10, //
           },
         },
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             color: "rgba(14,14,14,0.7)",
           },
           ticks: {
-            color: "#0e0e0e",
+            color: "rgba(14,14,14,0.7)",
           },
         },
       },

@@ -13,6 +13,7 @@ def info_containers(request):
             data = json.loads(request.body)
             container_count = data.get('active_containers')
 
+            # Métodos para tratar o dado recebido nas tabelas do DB
             current_containers(container_count)
             max_containers(container_count)
             min_containers(container_count)
@@ -70,4 +71,3 @@ def min_containers(container_count):
     if DailyMin.objects.count() > 90:
         oldest_entry = DailyMin.objects.order_by('date').first()
         oldest_entry.delete()
-##
