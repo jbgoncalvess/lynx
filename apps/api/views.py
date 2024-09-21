@@ -70,3 +70,4 @@ def min_containers(container_count):
     if DailyMin.objects.count() > 90:
         oldest_entry = DailyMin.objects.order_by('date').first()
         oldest_entry.delete()
+##
