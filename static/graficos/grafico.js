@@ -52,13 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       plugins: {
         legend: {
-          display: false
+          display: true,  // Exibe a legenda
+          position: 'top',  // Posição da legenda ('top', 'bottom', 'left', 'right')
+          labels: {
+            color: '#000',  // Cor do texto da legenda
+            font: {
+              size: 13,  // Tamanho da fonte
+            },
+            boxWidth: 10,  // Largura da caixa de cor da legenda
+          },
         },
         tooltip: {
           backgroundColor: "#333",
           titleColor: "#fdfdfd",
           bodyColor: "#fdfdfd",
-          borderColor: "#007bff",
+          borderColor: "#3ed91b",
           borderWidth: 2,
           caretSize: 13,
           bodyFont: {
