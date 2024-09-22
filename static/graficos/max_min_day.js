@@ -1,9 +1,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // Receber os dados transformados do HTML, que por sua vez recebeu da View
-  const chartData = document.getElementById('chart-data');
-  const data = JSON.parse(chartData.textContent);
-  const ctx = document.getElementById("myChart");
+  const mmd = document.getElementById('mmd_data');
+  const data = JSON.parse(mmd.textContent);
+  const ctx = document.getElementById("max_min_day");
 
   const myChart = new Chart(ctx, {
     type: "line",
@@ -34,19 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
       scales: {
         y: {
           grid: {
-            color: "rgba(14,14,14,0.7)",
+            color: "rgba(14,14,14,0.9)",
           },
           ticks: {
-            color: "rgba(14,14,14,0.7)",
+            color: "rgba(14,14,14,0.9)",
             // stepSize: 10, //
           },
         },
         x: {
           grid: {
-            color: "rgba(14,14,14,0.7)",
+            color: "rgba(14,14,14,0.9)",
           },
           ticks: {
-            color: "rgba(14,14,14,0.7)",
+            color: "rgba(14,14,14,0.9)",
           },
         },
       },

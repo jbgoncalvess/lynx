@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import ContainerStatus, DailyMax, DailyMin
+from .models import CurrentCount, DailyMax, DailyMin
 from django.utils import timezone
 import json
 
@@ -28,10 +28,10 @@ def info_containers(request):
 
 def current_containers(container_count):
     # Adiciona um novo registro na tabela ContainerStatus (time é adiciona o atual do Br)
-    ContainerStatus.objects.create(container_count=container_count)
+    CurrentCount.objects.create(container_count=container_count)
     # Manter apenas os últimos 3 registros de containers ativos para não acumular lixo
-    if ContainerStatus.objects.count() > 3:
-        oldest_entry = ContainerStatus.objects.order_by('time').first()
+    if CurrentCount.objects.count() > 3:
+        oldest_entry = CurrentCount.objects.order_by('time').first()
         oldest_entry.delete()
 
 

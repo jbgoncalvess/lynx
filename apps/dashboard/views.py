@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.api.models import ContainerStatus, DailyMax, DailyMin
+from apps.api.models import CurrentCount, DailyMax, DailyMin
 import json
 
 
 @login_required
 def dashboard_view(request):
     # Obtém o último registro de containers ativos
-    ult_reg = ContainerStatus.objects.order_by('-time').first()
+    ult_reg = CurrentCount.objects.order_by('-time').first()
 
     # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros
     daily_max_data = DailyMax.objects.order_by('-date')[:7]

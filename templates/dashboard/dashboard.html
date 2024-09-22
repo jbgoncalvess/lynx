@@ -23,47 +23,47 @@
             <a href="{% url 'home' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="210" height="70" alt="">
             </a>
-        <ul class="nav nav-pills flex-column mb-auto ">
-            <li class="nav-item">
-                <a href="{% url 'home' %}" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-home me-2"></i>
-                    Home
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'dashboard' %}" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-tachometer-alt me-2"></i>
-                    Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'containers' %}" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-box me-2"></i>
-                    Containers
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-image me-2"></i>
-                    Imagens
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                    <i class="fas fa-server me-2"></i>
-                    Balanceamento
-                </a>
-            </li>
-        </ul>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="{% url 'home' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                        <i class="fas fa-home me-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'containers' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                        <i class="fas fa-box me-2"></i>
+                        Containers
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                        <i class="fas fa-image me-2"></i>
+                        Imagens
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
+                        <i class="fas fa-server me-2"></i>
+                        Balanceamento
+                    </a>
+                </li>
+            </ul>
             <div class="dropdown mt-auto">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-mdb-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-circle-user me-2"></i>
                     <strong>{{ user.username }}</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-{#                    <li><a class="dropdown-item" href="#">Settings</a></li>#}
-{#                    <li><a class="dropdown-item" href="#">Profile</a></li>#}
-{#                    <li><hr class="dropdown-divider"></li>#}
+                    {# <li><a class="dropdown-item" href="#">Settings</a></li> #}
+                    {# <li><a class="dropdown-item" href="#">Profile</a></li> #}
+                    {# <li><hr class="dropdown-divider"></li> #}
                     <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
                 </ul>
             </div>
@@ -71,71 +71,85 @@
     </aside>
 
     <!-- Main content -->
-   <main class="content">
-    <div class="container">
-        <!-- Título do Dashboard -->
-        <h1 class="text-center bg-primary text-white p-1 rounded mb-3">
-            <i class="fas fa-tachometer-alt me-1"></i> DASHBOARD
-        </h1>
+    <main class="content">
+        <div class="container">
+            <!-- Título do Dashboard -->
+            <h1 class="text-center bg-primary text-white p-1 rounded mb-3">
+                <i class="fas fa-tachometer-alt me-1"></i> DASHBOARD
+            </h1>
 
-        <!-- Lista de informações -->
-        <ul class="list-group bg-primary rounded text-white mb-2">
-            {% if ult_reg %}
-                <li class="p-1 d-flex justify-content-between align-items-center">
-                    <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
-                    <span>Data e Hora: <strong>{{ ult_reg.time }}</strong></span>
-                </li>
-            {% else %}
-                <li class="list-group-item">Não há dados disponíveis.</li>
-            {% endif %}
-        </ul>
+            <!-- Lista de informações -->
+            <ul class="list-group bg-primary rounded text-white mb-2">
+                {% if ult_reg %}
+                    <li class="p-1 d-flex justify-content-between align-items-center">
+                        <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
+                        <span>Data e Hora: <strong>{{ ult_reg.time }}</strong></span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Não há dados disponíveis.</li>
+                {% endif %}
+            </ul>
 
-        <!-- Texto e Gráfico de Linhas -->
-        <i class="bg-primary text-black p-2 rounded text-center">Máximo e minímo de containers por dia</i>
-        <canvas class="w-100 border-5 rounded p-2 border-primary mb-2" id="myChart" height="280" style="border: solid;"></canvas>
+            <!-- Texto e Gráfico de Linhas -->
+            <i class="bg-primary text-black p-2 rounded text-center">Máximo e minímo de containers por dia</i>
+            <canvas class="w-100 border-5 rounded p-2 border-primary mb-2" id="max_min_day" height="280" style="border: solid;"></canvas>
 
-        <!-- Passar dados para o gráfico -->
-        <script id="chart-data" type="application/json">
-            {
-                "dates": {{ dates|safe }},
-                "min_container_counts": {{ min_container_counts|safe }},
-                "max_container_counts": {{ max_container_counts|safe }}
-            }
-        </script>
+            <!-- Passar dados para o gráfico -->
+            <script id="mmd_data" type="application/json">
+                {
+                    "dates": {{ dates|safe }},
+                    "min_container_counts": {{ min_container_counts|safe }},
+                    "max_container_counts": {{ max_container_counts|safe }}
+                }
+            </script>
 
-        <!-- Layout com gráfico de barras alinhado à esquerda -->
-        <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
-<div class="row">
-    <!-- Gráfico de barras (à esquerda) -->
-    <div class="col-md-6 mb-4">
-        <canvas id="smallBarChart" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-    </div>
+            <!-- Layout com gráfico de barras alinhado à esquerda -->
+            <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <canvas id="cpu" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
 
-    <!-- Barra lateral esquerda (gráfico) -->
-    <div class="col-md-6 mb-4">
-        <canvas id="smallBarChart2" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-    </div>
-</div>
+                <div class="col-md-6 mb-2">
+                    <canvas id="ram" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
 
+                <div class="col-md-6 mb-2">
+                    <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
 
+                <div class="col-md-6 mb-2">
+                    <canvas id="active_connections" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
 
-</div>
+                <div class="col-md-6 mb-2">
+                    <canvas id="http_errors" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
 
+                <div class="col-md-6 mb-2">
+                    <canvas id="latency" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
+            </div>
+        </div>
 
         <!-- Scripts -->
-        <script src="{% static 'graficos/grafico.js' %}"></script>
-        <script src="{% static 'graficos/grafico_2.js' %}"></script>
-</main>
+        <script src="{% static 'graficos/max_min_day.js' %}"></script>
+        <script src="{% static 'graficos/cpu.js' %}"></script>
+        <script src="{% static 'graficos/ram.js' %}"></script>
+        <script src="{% static 'graficos/rps.js' %}"></script>
+        <script src="{% static 'graficos/active_connections.js' %}"></script>
+        <script src="{% static 'graficos/http_errors.js' %}"></script>
+        <script src="{% static 'graficos/latency.js' %}"></script>
+    </main>
 
     <!-- MDB JS -->
     <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
 
-{# Footer #}
+    {# Footer #}
     <footer class="footer bg-dark text-white">
-      <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
+        <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
-
 </body>
 </html>
