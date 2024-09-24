@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.api.models import CurrentCount, DailyMaxMin
+from apps.api.models import CurrentCount, DailyMaxMin, ContainerMetrics
 import json
 
 
@@ -9,10 +9,8 @@ def dashboard_view(request):
     # Obtém o último registro de containers ativos
     ult_reg = CurrentCount.objects.order_by('-time').first()
 
-    # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros
+    # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros (26/08 - 25/08 ..)
     daily_max_min = DailyMaxMin.objects.order_by('-date')[:7]
-
-    # Inverte a ordem para exibir as datas do mais antigo para o mais recente
     daily_max_min = daily_max_min[::-1]
 
     # Formata as datas e valores de containers para o gráfico
@@ -21,18 +19,16 @@ def dashboard_view(request):
     min_container_counts = [entry.min_containers for entry in daily_max_min]
 
     # Passar vetor de string para o front-end js preciso converter com json.dumps
-    # dates = ['13/09', '14/09', '15/09', '16/09', '17/09', '18/09', '19/09']
-    # dates = ['13/09', '14/09']
     dates = json.dumps(dates)
     print(dates)
     # Inteiros não preciso converter
-    # max_container_counts = [3, 4, 5, 2, 10, 11, 7]
-    # max_container_counts = [7, 3]
 
     # Envia os dados como uma variável de contexto para o template
     return render(request, 'dashboard/dashboard.html', {
         'ult_reg': ult_reg,
         'dates': dates,
         'max_container_counts': max_container_counts,
-        'min_container_counts': min_container_counts
+        'min_container_counts': min_container_counts,
+
+
     })
