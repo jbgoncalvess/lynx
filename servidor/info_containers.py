@@ -14,12 +14,13 @@ def contar_containers_ativos():
         status_list = result.stdout.strip().split('\n')
         # Contando quantos containers estão no estado "RUNNING"
         containers_ativos = sum(1 for status in status_list if status == 'RUNNING')
-        #containers_ativos = 7
+        # containers_ativos = 7
         print(containers_ativos)
         return containers_ativos
     except Exception as e:
         print(f"Erro ao contar containers: {e}")
         return -1
+
 
 # Função para enviar os dados para o software
 def enviar_dados():
