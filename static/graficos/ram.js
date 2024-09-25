@@ -1,9 +1,10 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-    const ram = document.getElementById('ram_usage');
+    const ram = document.getElementById('ram_data');
     const data = JSON.parse(ram.textContent);
     const ctx = document.getElementById('ram').getContext('2d');
     // Configurações do gráfico de barras
-    const cpu_graph = new Chart(ctx, {
+    const ram_graph = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.container_names, // Exemplo de meses

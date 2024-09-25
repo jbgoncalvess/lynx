@@ -79,23 +79,25 @@ def metrics_containers(request):
                 container_name = container['name']
                 cpu_usage = container['cpu_usage']
                 ram_usage = container['ram_usage']
+                disk_usage = container['disk_usage']
 
-                print(f"NOME: {container_name}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}.")
+                print(f"NOME: {container_name}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage} , DISK_USAGE:{disk_usage}.")
 
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_name).first()
 
                 if existing_entry:
-                    existing_entry.time = timezone.localtime
+                    existing_entry.time = timezone.localtime()
                     existing_entry.cpu_usage = cpu_usage
                     existing_entry.ram_usage = ram_usage
-                    # existing_entry.rps =
+                    existing_entry.disk_usage = disk_usage
                     # existing_entry.active_connections =
                     # existing_entry.http_errors =
                     # existing_entry.latency =
+                    existing_entry.save()
                 else:
                     ContainerMetrics.objects.create(container_name=container_name, cpu_usage=cpu_usage,
-                                                    ram_usage=ram_usage,
-                                                    # rps=rps_usage, active_connections=active_connections,
+                                                    ram_usage=ram_usage, disk_usage=disk_usage,
+                                                    #active_connections=active_connections,
                                                     # http_errors=http_errors, http_errors=http_errors, latency=latency
                                                     )
 

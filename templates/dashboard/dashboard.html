@@ -103,20 +103,47 @@
                 }
             </script>
 
-            <script id="cpu_usage" type="application/json">
+            <script id="cpu_data" type="application/json">
                 {
                     "container_names": {{ container_names|safe }},
                     "cpu_usages": {{ cpu_usages|safe }}
                 }
             </script>
 
-            <script id="ram_usage" type="application/json">
+            <script id="ram_data" type="application/json">
                 {
                     "container_names": {{ container_names|safe }},
                     "ram_usages": {{ ram_usages|safe }}
                 }
             </script>
 
+            <script id="disk_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "disk_usages": {{ disk_usages|safe }}
+                }
+            </script>
+
+            <script id="active_connections_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "ram_usages": {{ ram_usages|safe }}
+                }
+            </script>
+
+            <script id="http_errors_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "ram_usages": {{ ram_usages|safe }}
+                }
+            </script>
+
+            <script id="latency_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "ram_usages": {{ ram_usages|safe }}
+                }
+            </script>
 
             <!-- Layout com gráfico de barras alinhado à esquerda -->
             <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
@@ -130,7 +157,7 @@
                 </div>
 
                 <div class="col-md-6 mb-2">
-                    <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                    <canvas id="disk" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
                 </div>
 
                 <div class="col-md-6 mb-2">
@@ -151,7 +178,7 @@
         <script src="{% static 'graficos/max_min_day.js' %}"></script>
         <script src="{% static 'graficos/cpu.js' %}"></script>
         <script src="{% static 'graficos/ram.js' %}"></script>
-        <script src="{% static 'graficos/rps.js' %}"></script>
+        <script src="{% static 'graficos/disk.js' %}"></script>
         <script src="{% static 'graficos/active_connections.js' %}"></script>
         <script src="{% static 'graficos/http_errors.js' %}"></script>
         <script src="{% static 'graficos/latency.js' %}"></script>

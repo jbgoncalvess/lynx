@@ -1,76 +1,80 @@
-const ctx_6 = document.getElementById('http_errors').getContext('2d');
 
-// Configurações do gráfico de barras
-const http_errors = new Chart(ctx_6, {
-    type: 'bar',
-    data: {
-        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'], // Exemplo de meses
-        datasets: [{
-            label: 'Erros HTTP',
-            data: [12, 19, 3, 5, 2, 3],  // Exemplo de dados
-            backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
-            borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
-            borderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',  // Legenda no topo (pode ajustar para 'bottom', 'left', etc)
-                labels: {
-                    color: '#000',  // Cor do texto da legenda
-                    padding: 10  // Espaçamento ao redor da legenda
+document.addEventListener('DOMContentLoaded', () => {
+    const http_errors = document.getElementById('http_errors_data');
+    const data = JSON.parse(http_errors.textContent);
+    const ctx = document.getElementById('http_errors').getContext('2d');
+    // Configurações do gráfico de barras
+    const http_errors_graph = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.container_names, // Exemplo de meses
+            datasets: [{
+                label: 'Erros HTTP',
+                data: data.cpu_usages,  // Exemplo de dados
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
+                borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',  // Legenda no topo (pode ajustar para 'bottom', 'left', etc)
+                    labels: {
+                        color: '#000',  // Cor do texto da legenda
+                        padding: 10  // Espaçamento ao redor da legenda
+                    }
+                },
+                tooltip: {
+                    backgroundColor: "#333",
+                    titleColor: "#fdfdfd",
+                    bodyColor: "#fdfdfd",
+                    borderColor: "#3ed91b",
+                    borderWidth: 2,
+                    caretSize: 13,
+                    bodyFont: {
+                        size: 17,
+                    },
+                    callbacks: {
+                        label: function (context) {
+                            return '  ' + context.raw + 's';
+                        }
+                    },
+                },
+            },
+            layout: {
+                padding: {
+                    top: 20,  // Espaçamento no topo do gráfico
+                    right: 10,
+                    bottom: 10,
+                    left: 10
                 }
             },
-            tooltip: {
-              backgroundColor: "#333",
-              titleColor: "#fdfdfd",
-              bodyColor: "#fdfdfd",
-              borderColor: "#3ed91b",
-              borderWidth: 2,
-              caretSize: 13,
-              bodyFont: {
-                size: 17,
-              },
-          callbacks: {
-            label: function (context) {
-              return '  ' + context.raw;
-            }
-          },
-        },
-        },
-        layout: {
-            padding: {
-                top: 20,  // Espaçamento no topo do gráfico
-                right: 10,
-                bottom: 10,
-                left: 10
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,  // Começar o eixo Y no zero
-                grid: {
-                    color: "rgba(14,14,14,0.9)",
+            scales: {
+                y: {
+                    beginAtZero: true,  // Começar o eixo Y no zero
+                    grid: {
+                        color: "rgba(14,14,14,0.8)",
+                    },
+                    ticks: {
+                        color: "rgb(0,0,0)",
+                        stepSize: 1  // Exibir números inteiros no eixo Y
+                    },
                 },
-                ticks: {
-                    color: "rgb(0,0,0)",
-                    stepSize: 1  // Exibir números inteiros no eixo Y
-                },
-            },
 
-            x: {
-                grid: {
-                    color: "rgba(14,14,14,0.9)",
+                x: {
+                    grid: {
+                        color: "rgba(14,14,14,0.8)",
+                    },
+                    ticks: {
+                        color: "rgb(0,0,0)",
+                        stepSize: 1  // Exibir números inteiros no eixo Y
+                    },
                 },
-                ticks: {
-                    color: "rgb(0,0,0)",
-                    stepSize: 1  // Exibir números inteiros no eixo Y
-                },
-            },
+            }
         }
-    }
+    });
 });

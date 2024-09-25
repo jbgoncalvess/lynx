@@ -27,10 +27,11 @@ def dashboard_view(request):
     container_names = [container.container_name for container in container_metrics]
     cpu_usages = [container.cpu_usage for container in container_metrics]
     ram_usages = [container.ram_usage for container in container_metrics]
+    disk_usages = [container.disk_usage for container in container_metrics]
 
     container_names = json.dumps(container_names)
 
-    print(container_names, cpu_usages, ram_usages)
+    print(container_names, cpu_usages, ram_usages, disk_usages)
 
 
 
@@ -45,5 +46,5 @@ def dashboard_view(request):
         'container_names': container_names,
         'cpu_usages': cpu_usages,
         'ram_usages': ram_usages,
-
+        'disk_usages': disk_usages
     })

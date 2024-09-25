@@ -1,5 +1,6 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-    const cpu = document.getElementById('cpu_usage');
+    const cpu = document.getElementById('cpu_data');
     const data = JSON.parse(cpu.textContent);
     const ctx = document.getElementById('cpu').getContext('2d');
     // Configurações do gráfico de barras
