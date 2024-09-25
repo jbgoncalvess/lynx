@@ -71,22 +71,24 @@ def metrics_containers(request):
         try:
             # Lê o corpo da requisição
             data = json.loads(request.body)
-
+            container_names = []
             # Itera sobre as métricas de cada container
             for container in data:
                 # Aqui, você pode querer implementar lógica para atualizar ou criar entradas
                 # Exemplo: Criar ou atualizar um registro no banco de dados com base no nome do container
-                container_name = container['name']
+                container_names.append(container['name']) # Crio uma lista pois os container que nao vir eu activate = f
                 cpu_usage = container['cpu_usage']
                 ram_usage = container['ram_usage']
                 disk_usage = container['disk_usage']
 
-                print(f"NOME: {container_name}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage} , DISK_USAGE:{disk_usage}.")
+                print(f"NOME: {container_names[-1]}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}"
+                      f" , DISK_USAGE:{disk_usage}.")
 
-                existing_entry = ContainerMetrics.objects.filter(container_name=container_name).first()
+                existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
 
                 if existing_entry:
                     existing_entry.time = timezone.localtime()
+                    existing_entry.active = True
                     existing_entry.cpu_usage = cpu_usage
                     existing_entry.ram_usage = ram_usage
                     existing_entry.disk_usage = disk_usage
@@ -95,12 +97,14 @@ def metrics_containers(request):
                     # existing_entry.latency =
                     existing_entry.save()
                 else:
-                    ContainerMetrics.objects.create(container_name=container_name, cpu_usage=cpu_usage,
+                    ContainerMetrics.objects.create(container_name=container_names[-1], cpu_usage=cpu_usage,
                                                     ram_usage=ram_usage, disk_usage=disk_usage,
                                                     #active_connections=active_connections,
                                                     # http_errors=http_errors, http_errors=http_errors, latency=latency
                                                     )
 
+            (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
+             .update(active=False))
             return JsonResponse({'status': 'success'}, status=200)
 
         except json.JSONDecodeError:

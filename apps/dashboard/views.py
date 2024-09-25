@@ -23,7 +23,8 @@ def dashboard_view(request):
     dates = json.dumps(dates)
     print(dates)
 
-    container_metrics = ContainerMetrics.objects.order_by('container_name')
+    container_metrics = ContainerMetrics.objects.filter(active=True).order_by('container_name')
+    print(container_metrics)
     container_names = [container.container_name for container in container_metrics]
     cpu_usages = [container.cpu_usage for container in container_metrics]
     ram_usages = [container.ram_usage for container in container_metrics]

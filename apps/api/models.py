@@ -24,6 +24,7 @@ class DailyMaxMin(models.Model):
 class ContainerMetrics(models.Model):
     container_name = models.CharField(max_length=100, unique=True)
     time = models.DateTimeField(default=timezone.now)
+    active = models.BooleanField(default=True)
 
     cpu_usage = models.FloatField(default=0)
     ram_usage = models.FloatField(default=0)
@@ -33,6 +34,6 @@ class ContainerMetrics(models.Model):
     latency = models.FloatField(default=0)
 
     def __str__(self):
-        return (f"Container {self.container_name} - {self.time} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
+        return (f"Container {self.container_name} - {self.time} - {self.active} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
                 f" - Disco: {self.disk_usage} - Active_conn: {self.active_connections} - HTTP: {self.http_errors}"
                 f" - latency: {self.latency}")

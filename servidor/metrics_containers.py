@@ -13,6 +13,8 @@ def convert_to_mib(value):
         return float(value.replace('GiB', '').strip()) * 1024  # Converte GiB para MiB
     elif 'MiB' in value:
         return float(value.replace('MiB', '').strip())  # Já está em MiB
+    elif 'KiB' in value:
+        return float(value.replace('KiB', '').strip()) / 1024
     return 0  # Caso não reconheça a unidade
 
 
@@ -21,9 +23,9 @@ def metrics_collect():
     containers_info = []  # Defina a lista aqui para garantir que exista
 
     try:
+        command = "lxc list --format csv --columns n,u,m,D,s | grep RUNNING | sed 's/,RUNNING//'"
         # Executa o comando para listar os containers ativos e suas métricas de CPU, RAM e disco
-        result = subprocess.run(['lxc', 'list', '--format', 'csv', '--columns', 'n,u,m,D'], capture_output=True,
-                                text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
         # Dividir a saída do comando em linhas
         linhas = result.stdout.strip().split('\n')
