@@ -33,6 +33,6 @@ class ContainerMetrics(models.Model):
     latency = models.FloatField(default=0)
 
     def __str__(self):
-        return (f"Container {self.container_id} - {self.time} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
+        return (f"Container {self.container_name} - {self.time} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
                 f" - RPS: {self.rps} - Active_conn: {self.active_connections} - HTTP: {self.http_errors}"
                 f" - latency: {self.latency}")

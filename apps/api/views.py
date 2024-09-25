@@ -60,6 +60,7 @@ def max_min_containers(container_count):
         oldest_entry = DailyMaxMin.objects.order_by('date').first()
         oldest_entry.delete()
 
+
 #######################################################################################################################
 #######################################################################################################################
 
@@ -81,7 +82,7 @@ def metrics_containers(request):
 
                 print(f"NOME: {container_name}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}.")
 
-                existing_entry = DailyMaxMin.objects.filter(container_name=container_name).first()
+                existing_entry = ContainerMetrics.objects.filter(container_name=container_name).first()
 
                 if existing_entry:
                     existing_entry.time = timezone.localtime
@@ -92,10 +93,11 @@ def metrics_containers(request):
                     # existing_entry.http_errors =
                     # existing_entry.latency =
                 else:
-                    DailyMaxMin.objects.create(container_name=container_name, cpu_usage=cpu_usage, ram_usage=ram_usage,
-                                               # rps=rps_usage, active_connections=active_connections,
-                                               # http_errors=http_errors, http_errors=http_errors, latency=latency
-                                               )
+                    ContainerMetrics.objects.create(container_name=container_name, cpu_usage=cpu_usage,
+                                                    ram_usage=ram_usage,
+                                                    # rps=rps_usage, active_connections=active_connections,
+                                                    # http_errors=http_errors, http_errors=http_errors, latency=latency
+                                                    )
 
             return JsonResponse({'status': 'success'}, status=200)
 

@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
   // Receber os dados transformados do HTML, que por sua vez recebeu da View
   const mmd = document.getElementById('mmd_data');
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           callbacks: {
             label: function (context) {
-              return '  ' + context.raw;
+              return '  ' + context.raw + 'containers';
             }
           },
         },
