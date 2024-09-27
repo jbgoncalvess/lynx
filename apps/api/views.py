@@ -80,9 +80,10 @@ def metrics_containers(request):
                 cpu_usage = container['cpu_usage']
                 ram_usage = container['ram_usage']
                 disk_usage = container['disk_usage']
+                uptime = container['uptime']
 
                 print(f"NOME: {container_names[-1]}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}"
-                      f" , DISK_USAGE:{disk_usage}.")
+                      f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime} .")
 
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
 
@@ -92,14 +93,14 @@ def metrics_containers(request):
                     existing_entry.cpu_usage = cpu_usage
                     existing_entry.ram_usage = ram_usage
                     existing_entry.disk_usage = disk_usage
-                    # existing_entry.active_connections =
+                    existing_entry.uptime = uptime
                     # existing_entry.http_errors =
                     # existing_entry.latency =
                     existing_entry.save()
                 else:
                     ContainerMetrics.objects.create(container_name=container_names[-1], cpu_usage=cpu_usage,
                                                     ram_usage=ram_usage, disk_usage=disk_usage,
-                                                    #active_connections=active_connections,
+                                                    update=uptime,
                                                     # http_errors=http_errors, http_errors=http_errors, latency=latency
                                                     )
 

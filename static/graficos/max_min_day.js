@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           callbacks: {
             label: function (context) {
-              return '  ' + context.raw + 'containers';
+              return '  ' + context.raw + ' Containers';
             }
           },
         },

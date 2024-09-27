@@ -29,11 +29,11 @@ class ContainerMetrics(models.Model):
     cpu_usage = models.FloatField(default=0)
     ram_usage = models.FloatField(default=0)
     disk_usage = models.FloatField(default=0)
-    active_connections = models.IntegerField(default=0)
+    uptime = models.IntegerField(default=0)
     http_errors = models.IntegerField(default=0)
     latency = models.FloatField(default=0)
 
     def __str__(self):
         return (f"Container {self.container_name} - {self.time} - {self.active} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
-                f" - Disco: {self.disk_usage} - Active_conn: {self.active_connections} - HTTP: {self.http_errors}"
+                f" - Disco: {self.disk_usage} - Active_conn: {self.uptime} - HTTP: {self.http_errors}"
                 f" - latency: {self.latency}")

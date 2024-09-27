@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('cpu_usage', models.FloatField(default=0)),
                 ('ram_usage', models.FloatField(default=0)),
                 ('rps', models.IntegerField(default=0)),
-                ('active_connections', models.IntegerField(default=0)),
+                ('uptime', models.IntegerField(default=0)),
                 ('http_errors', models.IntegerField(default=0)),
                 ('latency', models.FloatField(default=0)),
             ],
