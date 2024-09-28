@@ -18,24 +18,19 @@ def dashboard_view(request):
     max_container_counts = [entry.max_containers for entry in daily_max_min]
     min_container_counts = [entry.min_containers for entry in daily_max_min]
 
-    # Passar vetor de string para o front-end js preciso converter com json.dumps
-    # Inteiros não preciso converter
-    dates = json.dumps(dates)
-    print(dates)
-
     container_metrics = ContainerMetrics.objects.filter(active=True).order_by('container_name')
-    print(container_metrics)
     container_names = [container.container_name for container in container_metrics]
     cpu_usages = [container.cpu_usage for container in container_metrics]
     ram_usages = [container.ram_usage for container in container_metrics]
     disk_usages = [container.disk_usage for container in container_metrics]
     uptime = [container.uptime for container in container_metrics]
+    processes = [container.processes for container in container_metrics]
+    rps = [container.rps for container in container_metrics]
 
+    # Passar vetor de string para o front-end js preciso converter com json.dumps
+    # Inteiros não preciso converter
+    dates = json.dumps(dates)
     container_names = json.dumps(container_names)
-
-    print(container_names, cpu_usages, ram_usages, disk_usages, uptime)
-
-
 
     # Envia os dados como uma variável de contexto para o template
     return render(request, 'dashboard/dashboard.html', {
@@ -49,5 +44,7 @@ def dashboard_view(request):
         'cpu_usages': cpu_usages,
         'ram_usages': ram_usages,
         'disk_usages': disk_usages,
-        'uptime': uptime
+        'uptime': uptime,
+        'processes': processes,
+        'rps': rps
     })

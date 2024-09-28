@@ -1,16 +1,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const http_errors = document.getElementById('http_errors_data');
-    const data = JSON.parse(http_errors.textContent);
-    const ctx = document.getElementById('http_errors').getContext('2d');
+    const processes = document.getElementById('processes_data');
+    const data = JSON.parse(processes.textContent);
+    const ctx = document.getElementById('processes').getContext('2d');
     // Configurações do gráfico de barras
-    const http_errors_graph = new Chart(ctx, {
+    const processes_graph = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.container_names, // Exemplo de meses
             datasets: [{
-                label: 'Erros HTTP',
-                data: data.cpu_usages,  // Exemplo de dados
+                label: 'Processos Ativos',
+                data: data.processes,  // Exemplo de dados
                 backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
                 borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
                 borderWidth: 2
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     callbacks: {
                         label: function (context) {
-                            return '  ' + context.raw + 's';
+                            return '  ' + context.raw + ' Processos';
                         }
                     },
                 },

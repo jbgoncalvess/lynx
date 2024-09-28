@@ -1,16 +1,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const latency = document.getElementById('latency_data');
-    const data = JSON.parse(latency.textContent);
-    const ctx = document.getElementById('latency').getContext('2d');
+    const rps = document.getElementById('rps_data');
+    const data = JSON.parse(rps.textContent);
+    const ctx = document.getElementById('rps').getContext('2d');
     // Configurações do gráfico de barras
-    const latency_graph = new Chart(ctx, {
+    const rps_graph = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.container_names, // Exemplo de meses
             datasets: [{
-                label: 'Latência',
-                data: data.cpu_usages,  // Exemplo de dados
+                label: 'Requisições por Segundo (RPS)',
+                data: data.rps,  // Exemplo de dados
                 backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
                 borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
                 borderWidth: 2
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     callbacks: {
                         label: function (context) {
-                            return '  ' + context.raw + 's';
+                            return '  ' + context.raw + ' Requisições';
                         }
                     },
                 },

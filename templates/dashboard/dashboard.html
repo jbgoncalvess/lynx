@@ -131,17 +131,17 @@
                 }
             </script>
 
-            <script id="http_errors_data" type="application/json">
+            <script id="processes_data" type="application/json">
                 {
                     "container_names": {{ container_names|safe }},
-                    "ram_usages": {{ ram_usages|safe }}
+                    "processes": {{ processes|safe }}
                 }
             </script>
 
-            <script id="latency_data" type="application/json">
+            <script id="rps_data" type="application/json">
                 {
                     "container_names": {{ container_names|safe }},
-                    "ram_usages": {{ ram_usages|safe }}
+                    "rps": {{ rps|safe }}
                 }
             </script>
 
@@ -165,11 +165,11 @@
                 </div>
 
                 <div class="col-md-6 mb-2">
-                    <canvas id="http_errors" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                    <canvas id="processes" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
                 </div>
 
                 <div class="col-md-6 mb-2">
-                    <canvas id="latency" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                    <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
                 </div>
             </div>
         </div>
@@ -180,8 +180,8 @@
         <script src="{% static 'graficos/ram.js' %}"></script>
         <script src="{% static 'graficos/disk.js' %}"></script>
         <script src="{% static 'graficos/uptime.js' %}"></script>
-        <script src="{% static 'graficos/http_errors.js' %}"></script>
-        <script src="{% static 'graficos/latency.js' %}"></script>
+        <script src="{% static 'graficos/processes.js' %}"></script>
+        <script src="{% static 'graficos/rps.js' %}"></script>
     </main>
 
     <!-- MDB JS -->

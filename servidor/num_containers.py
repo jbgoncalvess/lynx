@@ -1,25 +1,23 @@
+# Neste código eu coleto as métricas que envolvem os containers em si, ou seja, entro em um por um
+
 import requests
 import json
 import subprocess
 import time
 
 # URL da minha API (view separada do software com "crsf except")
-url = 'http://192.168.2.135:8000/info_containers/'
+url = 'http://192.168.2.135:8000/num_containers/'
 
 
-# Função para contar o número de containers ativos usando um comando bash
+# Função para contar o número de containers ativos usando um comando do shell
 def contar_containers_ativos():
     try:
-        result = subprocess.run(['lxc', 'list', '--format', 'csv', '--columns', 's'], capture_output=True, text=True)
-        status_list = result.stdout.strip().split('\n')
-        # Contando quantos containers estão no estado "RUNNING"
-        containers_ativos = sum(1 for status in status_list if status == 'RUNNING')
-        # containers_ativos = 7
-        print(containers_ativos)
-        return containers_ativos
+        command = "lxc list --format csv --columns s | grep -c RUNNING"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return result.stdout.strip()
     except Exception as e:
         print(f"Erro ao contar containers: {e}")
-        return -1
+        return 0
 
 
 # Função para enviar os dados para o software

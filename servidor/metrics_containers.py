@@ -1,3 +1,5 @@
+# Neste código eu coleto as métricas que envolvem a máquina host do servidor e não os containers
+
 import requests
 import json
 import subprocess
@@ -53,7 +55,7 @@ def metrics_collect():
     containers_info = []  # Defino a lista aqui para garantir que exista
 
     try:
-        command = "lxc list --format csv --columns n,u,m,D,s | grep RUNNING | sed 's/,RUNNING//'"
+        command = "lxc list --format csv --columns n,u,m,D,s,N | grep RUNNING | sed 's/,RUNNING//'"
         # Executa o comando para listar os containers ativos e suas métricas de CPU, RAM e disco
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
@@ -68,14 +70,15 @@ def metrics_collect():
         for linha in linhas:
             if linha:  # Ignorar linhas vazias
                 # Nome do container, uso de CPU e uso de memória separados por vírgula
-                container_name, cpu_usage, ram_usage, disk_usage, uptime = linha.split(',')
+                container_name, cpu_usage, ram_usage, disk_usage, processes, uptime = linha.split(',')
 
                 # Converter uso de CPU para float (removendo 's')
                 cpu_usage = float(cpu_usage.replace('s', '').strip())
 
-                # Converter uso de RAM e disco para MiB e converter uptime para segundos
+                # Converter uso de RAM e disco para MiB e converter uptime para segundos 
                 ram_usage = convert_to_mib(ram_usage)
                 disk_usage = convert_to_mib(disk_usage)
+                processes = int(processes)
                 uptime = convert_to_minutes(uptime)
 
                 # Criar um dicionário com os dados coletados
@@ -84,7 +87,10 @@ def metrics_collect():
                     'cpu_usage': cpu_usage,  # Uso de CPU
                     'ram_usage': ram_usage,  # Uso de memória RAM
                     'disk_usage': disk_usage,  # Uso do disco
-                    'uptime': uptime # Tempo ativo do container
+                    'processes': processes,
+                    'uptime': uptime,  # Tempo ativo do container
+                    'rps': 5
+
                 }
 
                 containers_info.append(container_data)
