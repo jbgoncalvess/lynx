@@ -1,4 +1,4 @@
-# Neste código eu coleto as métricas que envolvem os containers em si, ou seja, entro em um por um
+# Neste código eu coleto as métricas que envolvem a máquina host do servidor e não os containers
 
 import requests
 import json
@@ -14,7 +14,8 @@ def contar_containers_ativos():
     try:
         command = "lxc list --format csv --columns s | grep -c RUNNING"
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        return result.stdout.strip()
+        print(int(result.stdout.strip()))
+        return int(result.stdout.strip())
     except Exception as e:
         print(f"Erro ao contar containers: {e}")
         return 0
