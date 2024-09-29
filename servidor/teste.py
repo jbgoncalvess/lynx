@@ -44,12 +44,23 @@ def last_sec(log_file):
 
         if result.returncode == 0:
             result = result.stdout.strip()
-            print(result)
             return datetime.strptime(result, '%d/%b/%Y:%H:%M:%S %z')
 
     except Exception as e:
         print(f"Erro ao enviar a data atual do log: {e}")
         return None
+
+
+def resolve_ip_name(requests_count):
+    ips = list(requests_count.keys())
+    command = "lxc list --format csv --columns n,4,s | grep RUNNING | cut -d ' ' -f 1 | sed 's/,RUNNING//'"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+
+    for ip in range(len(ips)):
+        ips[ip] = ips[ip].split(':')[0]
+
+    result
 
 
 # Função para contar requisições por container no último segundo
@@ -77,17 +88,14 @@ def count_requests(log_file):
             if timestamp == target_timestamp:
                 # Captura o IP upstream
                 upstream_ip = line.split('upstream: ')[1].split(',')[0].strip()
-                print(upstream_ip)
+                #print(upstream_ip)
                 # Incrementa o contador para esse IP
                 if upstream_ip in requests_count:
                     requests_count[upstream_ip] += 1
                 else:
                     requests_count[upstream_ip] = 1
 
-    # Exibe o resultado
-    for ip, count in requests_count.items():
-        print(f"{ip}, {count}")
-
+    resolve_ip_name(requests_count)
 
 # Função para coletar o valor de uptime de cada container
 def get_uptime(container_name):
@@ -117,8 +125,9 @@ def metrics_collect():
 
         # Inserir manualmente metricas que não consigo diretamente do lxc list (uptime)
         for n in range(len(linhas)):
-            linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + str(count_requests(log_file))
-        print(linhas)
+            linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + count_requests(log_file)
+
+        #print(count_requests(log_file))
 
         for linha in linhas:
             if linha:  # Ignorar linhas vazias
@@ -128,7 +137,7 @@ def metrics_collect():
                 # Converter uso de CPU para float (removendo 's')
                 cpu_usage = float(cpu_usage.replace('s', '').strip())
 
-                # Converter uso de RAM e disco para MiB e converter uptime para segundos 
+                # Converter uso de RAM e disco para MiB e converter uptime para segundos
                 ram_usage = convert_to_mib(ram_usage)
                 disk_usage = convert_to_mib(disk_usage)
                 processes = int(processes)
@@ -158,7 +167,7 @@ def metrics_collect():
 def send_metrics():
     # Coletar as métricas
     metrics_containers = metrics_collect()
-    print(metrics_containers)
+    #print(metrics_containers)
     # Enviar os dados para o software
     headers = {'Content-Type': 'application/json'}
 

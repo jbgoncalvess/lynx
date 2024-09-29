@@ -11,7 +11,7 @@ def obter_ultimo_timestamp(log_file):
 
         if result.returncode == 0:
             result = result.stdout.strip()
-            print(result)
+            #print(result)
             return datetime.strptime(result, '%d/%b/%Y:%H:%M:%S %z')
 
     except Exception as e:
@@ -44,7 +44,7 @@ def contar_requisicoes(log_file):
             if timestamp == target_timestamp:
                 # Captura o IP upstream
                 upstream_ip = line.split('upstream: ')[1].split(',')[0].strip()
-                print(upstream_ip)
+                #print(upstream_ip)
                 # Incrementa o contador para esse IP
                 if upstream_ip in requests_count:
                     requests_count[upstream_ip] += 1
@@ -54,6 +54,9 @@ def contar_requisicoes(log_file):
     # Exibe o resultado
     for ip, count in requests_count.items():
         print(f"{ip}, {count}")
+        requests_count[ip] = 
+
+    print(requests_count.items())
 
 while True:
     log_file = '/var/log/nginx/upstream_access.log'
