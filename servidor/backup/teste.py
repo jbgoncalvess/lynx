@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.2.135:8000/metrics_containers/'
+url = 'http://192.168.2.135:8000/metrics_containers/'  # Substitua pela URL correta da sua API
 
 
 # Função para converter valores em MiB
@@ -23,7 +23,7 @@ def convert_to_mib(value):
         return 0
 
 
-# Função para converter horas para minutos - Possíveis valores example: '12:33' e '57 min'
+# Função para converter horas para minutos - Possíveis valores tipo: '12:33' e '57 min'
 def convert_to_minutes(value):
     try:
         if ':' in value:
@@ -37,7 +37,6 @@ def convert_to_minutes(value):
         return 0
 
 
-# Função para pegar o último segundo de log, para coletar somente os logs referente aquele segundo
 def last_sec(log_file):
     try:
         command = f"tail -n 1 {log_file} | cut -d '[' -f 2 | cut -d ']' -f 1"
@@ -52,7 +51,7 @@ def last_sec(log_file):
         return None
 
 
-def resolv_ip_name(requests_count):
+def resolve_ip_name(requests_count):
     # Comando para listar os containers LXC que estão rodando e pegar o IP (ordenado por nome de container)
     command = ("lxc list --format csv --columns n,4,s | grep RUNNING | cut -d ' ' -f 1 | sed 's/,RUNNING//' | cut -d "
                "',' -f 2")
@@ -68,6 +67,7 @@ def resolv_ip_name(requests_count):
         # Adiciona o valor de requests_count correspondente ou '0' se não encontrar o IP
         rps.append(str(requests_count.get(container_ip + ":80", 0)))
 
+    print(rps)
     return rps
 
 
@@ -103,7 +103,8 @@ def count_requests(log_file):
                 else:
                     requests_count[upstream_ip] = 1
 
-    requests_in_order = resolv_ip_name(requests_count)
+    requests_in_order = []
+    requests_in_order = resolve_ip_name(requests_count)
     print(requests_in_order)
     return requests_in_order
 
@@ -133,11 +134,13 @@ def metrics_collect():
 
         # Dividir a saída do comando em linhas
         linhas = result.stdout.strip().split('\n')
-        print(linhas)
-        # Me retorna o RPS para cada container, em ordem
-        rps = count_requests(log_file)
 
-        # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
+        rps = []
+        rps = count_requests(log_file)
+        print(f"RPS LISTA: {rps}")
+        print(len(rps))
+        print(len(linhas))
+        # Inserir manualmente metricas que não consigo diretamente do lxc list (uptime)
         for n in range(len(linhas)):
             linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n]
 

@@ -9,7 +9,6 @@ def backup_e_esvaziar_log(log_file, backup_file):
     command = f"cat {log_file} >> {backup_file} && > {log_file}"
     subprocess.run(command, shell=True)
 
-
 if __name__ == "__main__":
     log_file = "/var/log/nginx/upstream_access.log"  # Arquivo de log original
     backup_file = "/var/log/nginx/backup_upstream_access.log"  # Arquivo de backup

@@ -54,7 +54,6 @@ def contar_requisicoes(log_file):
     # Exibe o resultado
     for ip, count in requests_count.items():
         print(f"{ip}, {count}")
-        requests_count[ip] = 
 
     print(requests_count.items())
 

@@ -76,7 +76,8 @@ def metrics_containers(request):
             for container in data:
                 # Aqui, você pode querer implementar lógica para atualizar ou criar entradas
                 # Exemplo: Criar ou atualizar um registro no banco de dados com base no nome do container
-                container_names.append(container['name']) # Crio uma lista pois os container que nao vir eu activate = f
+                # Crio uma lista, pois os container que nao vir eu activate = false
+                container_names.append(container['name'])
                 cpu_usage = container['cpu_usage']
                 ram_usage = container['ram_usage']
                 disk_usage = container['disk_usage']
@@ -102,7 +103,7 @@ def metrics_containers(request):
                 else:
                     ContainerMetrics.objects.create(container_name=container_names[-1], cpu_usage=cpu_usage,
                                                     ram_usage=ram_usage, disk_usage=disk_usage,
-                                                    update=uptime,
+                                                    uptime=uptime,
                                                     processes=processes, rps=rps)
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
