@@ -145,6 +145,19 @@
                 }
             </script>
 
+            <script id="upstream_response_time_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "urt": {{ urt|safe }}
+                }
+            </script>
+
+            <script id="request_time_data" type="application/json">
+                {
+                    "container_names": {{ container_names|safe }},
+                    "rt": {{ rt|safe }}
+                }
+            </script>
             <!-- Layout com gráfico de barras alinhado à esquerda -->
             <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
             <div class="row">
@@ -171,6 +184,14 @@
                 <div class="col-md-6 mb-2">
                     <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
                 </div>
+
+                <div class="col-md-6 mb-2">
+                    <canvas id="upstream_response_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <canvas id="request_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
             </div>
         </div>
 
@@ -182,6 +203,9 @@
         <script src="{% static 'graficos/uptime.js' %}"></script>
         <script src="{% static 'graficos/processes.js' %}"></script>
         <script src="{% static 'graficos/rps.js' %}"></script>
+        <script src="{% static 'graficos/upstream_response_time.js' %}"></script>
+        <script src="{% static 'graficos/request_time.js' %}"></script>
+
     </main>
 
     <!-- MDB JS -->

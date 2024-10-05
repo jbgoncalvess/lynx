@@ -29,7 +29,7 @@ DEBUG = True
 
 # Necessário adicionar o endereço IP do servidor que estará sendo monitorado, já que ele
 # deve enviar dados pro software
-ALLOWED_HOSTS = ['192.168.2.156', '127.0.0.1', '192.168.2.135']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 

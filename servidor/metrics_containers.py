@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.2.135:8000/metrics_containers/'
+url = 'http://192.168.2.104:8000/metrics_containers/'
 
 
 # Função para converter valores em MiB
@@ -60,19 +60,39 @@ def resolv_ip_name(requests_count):
     # Separo a saída do comando quebrando a linha, isso faz com que eu crie uma lista
     container_ips = result.stdout.strip().split('\n')
 
-    # Inicializa uma lista para armazenar as contagens de RPS por container
+    # Inicializa uma lista para armazenar as contagens de RPS, upstream_response_times e request_times por container
     rps = []
+    urt = []
+    rt = []
+
+    requests_count['10.1.1.5'+':80']['upstream_response_times'][0] = 10.0
+    requests_count['10.1.1.5'+':80']['upstream_response_times'][1] = 2.0
+    requests_count['10.1.1.5'+':80']['upstream_response_times'].append(1.5)
+
+    def average_aritmetica(sublist):
+        if sublist:
+            return sum(sublist) / len(sublist)
+        return 0
 
     # Para cada IP de container, verifico se ele recebeu uma atribuição de rps
     for container_ip in container_ips:
         # Adiciona o valor de requests_count correspondente ou '0' se não encontrar o IP
-        rps.append(str(requests_count.get(container_ip + ":80", 0)))
+        rps.append(str(requests_count.get(container_ip + ":80", {}).get('count', 0)))
+        urt.append(str(average_aritmetica(requests_count.get(container_ip + ":80", {}).get('upstream_response_times', 0))))
+        rt.append(str(average_aritmetica(requests_count.get(container_ip + ":80", {}).get('request_times', 0))))
 
-    return rps
+
+    print("TESTANDO\n")
+    print(rps)
+    print(urt)
+    print(rt)
+    data = [rps, urt, rt]
+    print(data)
+    return data
 
 
 # Função para contar requisições por container no último segundo
-def count_requests(log_file):
+def metrics_log(log_file):
     last_timestamp = last_sec(log_file)
 
     if last_timestamp is None:
@@ -97,11 +117,21 @@ def count_requests(log_file):
                 # Captura o IP upstream
                 upstream_ip = line.split('upstream: ')[1].split(',')[0].strip()
                 # print(upstream_ip)
-                # Incrementa o contador para esse IP
+                upstream_response_time = float(line.split('upstream_response_time: ')[1].split(',')[0].strip())
+                request_time = float(line.split('request_time: ')[1].split(',')[0].strip())
+                # print(upstream_response_time, request_time)
+                # Incrementa o contador para esse IP e adiciona os tempos, já que pode ser mais 1 por sec
                 if upstream_ip in requests_count:
-                    requests_count[upstream_ip] += 1
+                    requests_count[upstream_ip]['count'] += 1
+                    requests_count[upstream_ip]['upstream_response_times'].append(upstream_response_time)
+                    requests_count[upstream_ip]['request_times'].append(request_time)
                 else:
-                    requests_count[upstream_ip] = 1
+                    # requests_count[upstream_ip] = 1
+                    requests_count[upstream_ip] = {
+                        'count': 1,
+                        'upstream_response_times': [upstream_response_time],
+                        'request_times': [request_time]
+                    }
 
     requests_in_order = resolv_ip_name(requests_count)
     print(requests_in_order)
@@ -125,7 +155,7 @@ def get_uptime(container_name):
 def metrics_collect():
     log_file = '/var/log/nginx/upstream_access.log'
     containers_info = []  # Defino a lista aqui para garantir que exista
-
+    rps_urt_rt = []
     try:
         command = "lxc list --format csv --columns n,u,m,D,s,N | grep RUNNING | sed 's/,RUNNING//'"
         # Executa o comando para listar os containers ativos e suas métricas de CPU, RAM e disco
@@ -135,18 +165,24 @@ def metrics_collect():
         linhas = result.stdout.strip().split('\n')
         print(linhas)
         # Me retorna o RPS para cada container, em ordem
-        rps = count_requests(log_file)
-
+        rps_urt_rt = metrics_log(log_file)
+        print(f'TESTANDOOOOOOOOOOOO: {rps_urt_rt}')
+        rps = rps_urt_rt[0]
+        urt = rps_urt_rt[1]
+        rt = rps_urt_rt[2]
+        print(rps)
+        print(urt)
+        print(rt)
         # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
         for n in range(len(linhas)):
-            linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n]
+            linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n] + ',' + urt[n] + ',' + rt[n]
 
         print(linhas)
 
         for linha in linhas:
             if linha:  # Ignorar linhas vazias
                 # Nome do container, uso de CPU e uso de memória separados por vírgula
-                container_name, cpu_usage, ram_usage, disk_usage, processes, uptime, rps = linha.split(',')
+                container_name, cpu_usage, ram_usage, disk_usage, processes, uptime, rps, urt, rt = linha.split(',')
 
                 # Converter uso de CPU para float (removendo 's')
                 cpu_usage = float(cpu_usage.replace('s', '').strip())
@@ -157,18 +193,21 @@ def metrics_collect():
                 processes = int(processes)
                 uptime = convert_to_minutes(uptime)
                 rps = int(rps)
-
+                urt = float(urt)
+                rt = float(rt)
                 # Criar um dicionário com os dados coletados
                 container_data = {
                     'name': container_name,
                     'cpu_usage': cpu_usage,  # Uso de CPU
                     'ram_usage': ram_usage,  # Uso de memória RAM
                     'disk_usage': disk_usage,  # Uso do disco
-                    'processes': processes,
                     'uptime': uptime,  # Tempo ativo do container
-                    'rps': rps
+                    'processes': processes,
+                    'rps': rps,
+                    'urt': urt,
+                    'rt': rt
                 }
-
+                print(container_data)
                 containers_info.append(container_data)
 
     except Exception as e:

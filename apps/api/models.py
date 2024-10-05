@@ -32,8 +32,10 @@ class ContainerMetrics(models.Model):
     uptime = models.IntegerField(default=0)
     processes = models.IntegerField(default=0)
     rps = models.FloatField(default=0)
+    urt = models.FloatField(default=0)
+    rt = models.FloatField(default=0)
 
     def __str__(self):
         return (f"Container {self.container_name} - {self.time} - {self.active} - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
                 f" - Disco: {self.disk_usage} - Uptime: {self.uptime} - Processos: {self.processes}"
-                f" - RPS: {self.rps}")
+                f" - RPS: {self.rps} - URT: {self.urt} - RT: {self.rt}")

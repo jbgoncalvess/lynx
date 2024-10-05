@@ -6,7 +6,7 @@ import subprocess
 import time
 
 # URL da minha API (view separada do software com "crsf except")
-url = 'http://192.168.2.135:8000/num_containers/'
+url = 'http://192.168.2.104:8000/num_containers/'
 
 
 # Função para contar o número de containers ativos usando um comando do shell

@@ -74,7 +74,6 @@ def metrics_containers(request):
             container_names = []
             # Itera sobre as métricas de cada container
             for container in data:
-                # Aqui, você pode querer implementar lógica para atualizar ou criar entradas
                 # Exemplo: Criar ou atualizar um registro no banco de dados com base no nome do container
                 # Crio uma lista, pois os container que nao vir eu activate = false
                 container_names.append(container['name'])
@@ -84,9 +83,12 @@ def metrics_containers(request):
                 uptime = container['uptime']
                 processes = container['processes']
                 rps = container['rps']
+                urt = container['urt']
+                rt = container['rt']
 
                 print(f"NOME: {container_names[-1]}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}"
-                      f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime}, PROCESSES: {processes}, RPS: {rps}.")
+                      f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime}, PROCESSES: {processes}, RPS: {rps}, URT: {urt}, "
+                      f" RT: {rt}.")
 
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
 
@@ -99,12 +101,14 @@ def metrics_containers(request):
                     existing_entry.uptime = uptime
                     existing_entry.processes = processes
                     existing_entry.rps = rps
+                    existing_entry.urt = urt
+                    existing_entry.rt = rt
                     existing_entry.save()
                 else:
                     ContainerMetrics.objects.create(container_name=container_names[-1], cpu_usage=cpu_usage,
                                                     ram_usage=ram_usage, disk_usage=disk_usage,
                                                     uptime=uptime,
-                                                    processes=processes, rps=rps)
+                                                    processes=processes, rps=rps, urt=urt, rt=rt)
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
              .update(active=False))
