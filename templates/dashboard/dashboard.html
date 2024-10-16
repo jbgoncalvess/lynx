@@ -83,7 +83,7 @@
                 {% if ult_reg %}
                     <li class="p-1 d-flex justify-content-between align-items-center">
                         <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
-                        <span>Data e Hora: <strong>{{ ult_reg.time }}</strong></span>
+                        <span>Data e Hora: <strong>{{ ult_reg.time|date:"d/m/Y H:i:s" }}</strong></span>
                     </li>
                 {% else %}
                     <li class="list-group-item">Não há dados disponíveis.</li>

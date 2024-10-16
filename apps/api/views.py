@@ -1,28 +1,76 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import CurrentCount, DailyMaxMin, ContainerMetrics
+from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP
 from django.utils import timezone
 import json
 
 
 @csrf_exempt
-def num_containers(request):
+def data_lxc_list(request):
     if request.method == 'POST':
         try:
-            # Adiciono o corpo da requisição a variável data e obtenho o número de containers ativos (30s)
+            # Converte o conteúdo da requisição JSON para dicionário
             data = json.loads(request.body)
-            container_count = data.get('active_containers')
 
-            # Métodos para tratar o dado recebido nas tabelas do DB
-            current_containers(container_count)
-            max_min_containers(container_count)
+            # Extraio o número de containers ativos, insere no banco e compara com max e min
+            active_containers = data.get('active_containers', 0)
+            current_containers(active_containers)
+            max_min_containers(active_containers)
 
-            # Retorna uma resposta de sucesso
-            return JsonResponse({'status': 'success'}, status=200)
+            # Extrai a lista de containers e seus detalhes
+            containers = data.get('containers', [])
+            print(containers)
+
+            # Processa cada container recebido
+            for container_data in containers:
+                container_name = container_data.get('name')
+                status = container_data.get('status', 'UNKNOWN')
+                ipv4_list = container_data.get('ipv4', [])
+                ipv6_list = container_data.get('ipv6', [])
+
+                # Verifica se o container já existe no banco de dados e cria/atualiza
+                container, created = ContainerLxcList.objects.update_or_create(
+                    container_name=container_name,
+                    defaults={
+                        'status': status,
+                        'time': timezone.now(),
+                    }
+                )
+
+                # Remove os IPs antigos associados ao container se já existiam
+                if not created:
+                    container.ips.all().delete()
+
+                # Adiciono endereços IPv4. Avança a cada 2, já que recebo os dados "IPV4, interface".
+                for i in range(0, len(ipv4_list), 2):  # A lista de ipv4 alterna entre IP e interface
+                    ip_address = ipv4_list[i]
+                    interface = ipv4_list[i + 1]  # A interface está no índice seguinte
+                    ContainerIP.objects.create(
+                        container=container,
+                        ip_address=ip_address,
+                        interface=interface,  # Ajuste se a interface variar
+                        ip_type='IPv4',
+                    )
+
+                # Adiciono endereços IPV6. Avança a cada 2, já que recebo os dados "IPV6, interface".
+                for i in range(0, len(ipv6_list), 2):  # A lista de ipv6 alterna entre IP e interface
+                    ip_address = ipv6_list[i]
+                    interface = ipv6_list[i + 1]  # A interface está no índice seguinte
+                    ContainerIP.objects.create(
+                        container=container,
+                        ip_address=ip_address,
+                        interface=interface,  # Ajuste se a interface variar
+                        ip_type='IPv6',
+                    )
+
+            return JsonResponse({"message": "Dados recebidos e salvos com sucesso."}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-
-    return JsonResponse({'status': 'invalid request'}, status=400)
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+    else:
+        return JsonResponse({"error": "Método não permitido."}, status=405)
 
 
 def current_containers(container_count):
@@ -53,7 +101,11 @@ def max_min_containers(container_count):
 
     # Se não tiver registro, eu crio um novo com o valor que chegou, tanto para Min quanto para Max
     else:
-        DailyMaxMin.objects.create(date=current_date, max_containers=container_count, min_containers=container_count)
+        DailyMaxMin.objects.create(
+            date=current_date,
+            max_containers=container_count,
+            min_containers=container_count,
+        )
 
     # Mantém no máximo 90 dias de registros
     if DailyMaxMin.objects.count() > 90:
@@ -105,10 +157,17 @@ def metrics_containers(request):
                     existing_entry.rt = rt
                     existing_entry.save()
                 else:
-                    ContainerMetrics.objects.create(container_name=container_names[-1], cpu_usage=cpu_usage,
-                                                    ram_usage=ram_usage, disk_usage=disk_usage,
-                                                    uptime=uptime,
-                                                    processes=processes, rps=rps, urt=urt, rt=rt)
+                    ContainerMetrics.objects.create(
+                        container_name=container_names[-1],
+                        cpu_usage=cpu_usage,
+                        ram_usage=ram_usage,
+                        disk_usage=disk_usage,
+                        uptime=uptime,
+                        processes=processes,
+                        rps=rps,
+                        urt=urt,
+                        rt=rt,
+                    )
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
              .update(active=False))
@@ -120,3 +179,7 @@ def metrics_containers(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+
+#######################################################################################################################
+#######################################################################################################################
