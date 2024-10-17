@@ -25,19 +25,22 @@
             </a>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="{% url 'home' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                    <a href="{% url 'home' %}" class="nav-link text-white bg-transparent border border-white rounded
+                       {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
                         <i class="fas fa-home me-2"></i>
                         Home
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'dashboard' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                    <a href="{% url 'dashboard' %}" class="nav-link text-white bg-transparent border border-white rounded
+                       {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                         <i class="fas fa-tachometer-alt me-2"></i>
                         Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'containers' %}" class="nav-link text-white bg-transparent border border-white rounded">
+                    <a href="{% url 'containers' %}" class="nav-link text-white bg-transparent border border-white rounded
+                       {% if request.resolver_match.url_name == 'containers' %}active{% endif %}">
                         <i class="fas fa-box me-2"></i>
                         Containers
                     </a>
@@ -61,14 +64,12 @@
                     <strong>{{ user.username }}</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-                    {# <li><a class="dropdown-item" href="#">Settings</a></li> #}
-                    {# <li><a class="dropdown-item" href="#">Profile</a></li> #}
-                    {# <li><hr class="dropdown-divider"></li> #}
                     <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
                 </ul>
             </div>
         </div>
     </aside>
+
 
     <!-- Main content -->
     <main class="content">

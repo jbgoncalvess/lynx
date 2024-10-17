@@ -6,13 +6,29 @@
   z-index: 1;
 }
 
-/*Espaçamento pra sidebar*/
+/* Espaçamento pra sidebar*/
 .content {
   margin-left: 250px; /* espaçamento à esquerda para dar lugar à sidebar */
   padding-bottom: 60px; /* Adiciona espaço no fundo para o footer */
 }
 
-/*Onde eu escrevo o conteúdo de cada App*/
+/* Estilo para o link ativo. Lembrar de forçar o estilo a sobrescrever o do MDB!!! */
+.sidebar .nav-link.active {
+  background-color: #0056b3 !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-color: white !important;
+}
+
+/* Efeito hover para os links da sidebar passando o mouse */
+.sidebar .nav-link:hover {
+  background-color: #0056b3 !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-color: #0056b3 !important;
+}
+
+/* Onde eu escrevo o conteúdo de cada App*/
 .container {
   width: 100%;
   padding: 15px; /* espaçamento interno */
@@ -26,7 +42,7 @@
   bottom: 0;
 }
 
-/*Arruma a escrita do footer*/
+/* Arruma a escrita do footer*/
 .footer p {
   margin: 0;
 }

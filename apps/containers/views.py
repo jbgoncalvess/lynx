@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from apps.api.models import ContainerLxcList, CurrentCount
+from django.contrib.auth.decorators import login_required
 import re
 
 
@@ -7,6 +8,7 @@ def natural_key(container):
     return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', container.container_name)]
 
 
+@login_required
 def containers_view(request):
 
     ult_reg = CurrentCount.objects.order_by('-time').first()
