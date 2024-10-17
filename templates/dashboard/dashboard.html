@@ -72,23 +72,11 @@
 
     <!-- Main content -->
     <main class="content">
-        <div class="container">
+        <div class="container-fluid">
             <!-- Título do Dashboard -->
-            <h1 class="text-center bg-primary text-white p-1 rounded mb-3">
+            <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
                 <i class="fas fa-tachometer-alt me-1"></i> DASHBOARD
             </h1>
-
-            <!-- Lista de informações -->
-            <ul class="list-group bg-primary rounded text-white mb-2">
-                {% if ult_reg %}
-                    <li class="p-1 d-flex justify-content-between align-items-center">
-                        <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
-                        <span>Data e Hora: <strong>{{ ult_reg.time|date:"d/m/Y H:i:s" }}</strong></span>
-                    </li>
-                {% else %}
-                    <li class="list-group-item">Não há dados disponíveis.</li>
-                {% endif %}
-            </ul>
 
             <!-- Texto e Gráfico de Linhas -->
             <i class="bg-primary text-black p-2 rounded text-center">Máximo e minímo de containers por dia</i>

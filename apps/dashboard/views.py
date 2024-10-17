@@ -40,7 +40,6 @@ def dashboard_view(request):
     urt = [container.urt for container in container_metrics]
     rt = [container.rt for container in container_metrics]
 
-
     # Passar vetor de string para o front-end js preciso converter com json.dumps
     # Inteiros não preciso converter
     dates = json.dumps(dates)

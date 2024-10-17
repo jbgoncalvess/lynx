@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.2.104:8000/metrics_containers/'
+url = 'http://192.168.2.105:8000/metrics_containers/'
 
 
 # Função para converter valores em MiB
@@ -45,6 +45,7 @@ def last_sec(log_file):
 
         if result.returncode == 0:
             result = result.stdout.strip()
+            print(datetime.strptime(result, '%d/%b/%Y:%H:%M:%S %z'))
             return datetime.strptime(result, '%d/%b/%Y:%H:%M:%S %z')
 
     except Exception as e:
@@ -65,9 +66,9 @@ def resolv_ip_name(requests_count):
     urt = []
     rt = []
 
-    requests_count['10.1.1.5'+':80']['upstream_response_times'][0] = 10.0
-    requests_count['10.1.1.5'+':80']['upstream_response_times'][1] = 2.0
-    requests_count['10.1.1.5'+':80']['upstream_response_times'].append(1.5)
+    #requests_count['10.1.1.5'+':80']['upstream_response_times'][0] = 10.0
+    #requests_count['10.1.1.5'+':80']['upstream_response_times'][1] = 2.0
+    #requests_count['10.1.1.5'+':80']['upstream_response_times'].append(1.5)
 
     def average_aritmetica(sublist):
         if sublist:
@@ -111,7 +112,6 @@ def metrics_log(log_file):
             timestamp_str = line.split('[')[1].split(']')[0].strip()
             # print(timestamp_str)
             timestamp = datetime.strptime(timestamp_str, '%d/%b/%Y:%H:%M:%S %z')
-
             # Se a linha está dentro do último segundo, conta a requisição
             if timestamp == target_timestamp:
                 # Captura o IP upstream
@@ -133,6 +133,7 @@ def metrics_log(log_file):
                         'request_times': [request_time]
                     }
 
+    print(requests_count)
     requests_in_order = resolv_ip_name(requests_count)
     print(requests_in_order)
     return requests_in_order
@@ -164,6 +165,7 @@ def metrics_collect():
         # Dividir a saída do comando em linhas
         linhas = result.stdout.strip().split('\n')
         print(linhas)
+        print("arroz")
         # Me retorna o RPS para cada container, em ordem
         rps_urt_rt = metrics_log(log_file)
         print(f'TESTANDOOOOOOOOOOOO: {rps_urt_rt}')

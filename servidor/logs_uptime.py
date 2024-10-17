@@ -18,5 +18,5 @@ if __name__ == "__main__":
         backup_e_esvaziar_log(log_file, backup_file)
         print(f"[{datetime.now()}] Arquivo de log copiado para {backup_file} e esvaziado.")
 
-        # Espera 5 minutos
+        # Esperar 5 minutos
         time.sleep(300)
