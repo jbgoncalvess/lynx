@@ -104,6 +104,7 @@
                             <th>Modificar IP</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for container_name, status, ips in container_data %}
                         <tr>
@@ -112,14 +113,14 @@
                             <td>
                                 {% for ip in ips %}
                                     {% if ip.ip_type == 'IPv4' %}
-                                        <li>{{ ip.ip_address }} {{ ip.interface }}</li>
+                                        <span>{{ ip.ip_address }} {{ ip.interface }}</span><br> <!-- O <br> adiciona uma quebra de linha -->
                                     {% endif %}
                                 {% endfor %}
                             </td>
                             <td>
                                 {% for ip in ips %}
                                     {% if ip.ip_type == 'IPv6' %}
-                                        <li>{{ ip.ip_address }} {{ ip.interface }}</li>
+                                        <span>{{ ip.ip_address }} {{ ip.interface }}</span><br> <!-- O <br> adiciona uma quebra de linha -->
                                     {% endif %}
                                 {% endfor %}
                             </td>
