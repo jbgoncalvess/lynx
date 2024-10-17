@@ -13,6 +13,7 @@
     <link href="{% static 'home/base.css' %}" rel="stylesheet">
 </head>
 
+
 {# Body #}
 <body>
     <!-- Sidebar -->
@@ -59,16 +60,17 @@
                     <strong>{{ user.username }}</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-{#                    <li><a class="dropdown-item" href="#">Settings</a></li>#}
-{#                    <li><a class="dropdown-item" href="#">Profile</a></li>#}
-{#                    <li><hr class="dropdown-divider"></li>#}
+                    {#<li><a class="dropdown-item" href="#">Settings</a></li>#}
+                    {#<li><a class="dropdown-item" href="#">Profile</a></li>#}
+                    {#<li><hr class="dropdown-divider"></li>#}
                     <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
                 </ul>
             </div>
         </div>
     </aside>
 
-    <!-- Main content -->
+
+    {# Main #}
     <main class="content">
         <div class="container-fluid"> <!-- Usando container-fluid para maior largura -->
             <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
@@ -76,7 +78,7 @@
             </h1>
 
             <!-- Lista de informações -->
-            <ul class="list-group bg-primary rounded text-white mb-3"> <!-- Espaço adicionado -->
+            <ul class="list-group bg-primary rounded text-white mb-2">
                 {% if ult_reg %}
                     <li class="p-1 d-flex justify-content-between align-items-center">
                         <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
@@ -88,59 +90,75 @@
             </ul>
 
             <!-- Tabela de containers -->
-            <table class="table table-bordered border-primary bg-light rounded mb-3">
-                <thead class="bg-dark text-white">
-                    <tr>
-                        <th>Nome do Container</th>
-                        <th>Status</th>
-                        <th>IPv4</th>
-                        <th>IPv6</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for container_name, status, ips in container_data %}
-                    <tr>
-                        <td>{{ container_name }}</td>
-                        <td>{{ status }}</td>
-                        <td>
-                            <ul>
+            <div class="table-responsive border border-primary border-5 rounded mb-2"> <!-- Adicionado div com rounded -->
+                <table class="table table-striped bg-light mb-1 align-middle text-center">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>Nome do Container</th>
+                            <th>Status</th>
+                            <th>IPv4</th>
+                            <th>IPv6</th>
+                            <th>Iniciar</th>
+                            <th>Parar</th>
+                            <th>Reiniciar</th>
+                            <th>Modificar IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for container_name, status, ips in container_data %}
+                        <tr>
+                            <td>{{ container_name }}</td>
+                            <td>{{ status }}</td>
+                            <td>
                                 {% for ip in ips %}
                                     {% if ip.ip_type == 'IPv4' %}
                                         <li>{{ ip.ip_address }} {{ ip.interface }}</li>
                                     {% endif %}
                                 {% endfor %}
-                            </ul>
-                        </td>
-                        <td>
-                            <ul>
+                            </td>
+                            <td>
                                 {% for ip in ips %}
                                     {% if ip.ip_type == 'IPv6' %}
                                         <li>{{ ip.ip_address }} {{ ip.interface }}</li>
                                     {% endif %}
                                 {% endfor %}
-                            </ul>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
 
-
-            <!-- Mensagem adicional -->
-            <p class="bg-info text-white p-2 rounded">
-                Aproveite para navegar pelos recursos disponíveis no sistema e gerenciar
-                seus servidores de forma rápida e eficiente!
-            </p>
+                            <!-- Botões de ação -->
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3" data-mdb-ripple-init data-ripple-color="primary">
+                                    <i class="fas fa-play"></i> <!-- Ícone para "Iniciar" -->
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3" data-mdb-ripple-init data-ripple-color="primary">
+                                    <i class="fas fa-stop"></i> <!-- Ícone para "Parar" -->
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3" data-mdb-ripple-init data-ripple-color="primary">
+                                    <i class="fas fa-redo"></i> <!-- Ícone para "Reiniciar" -->
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3" data-mdb-ripple-init data-ripple-color="primary">
+                                    <i class="fas fa-edit"></i> <!-- Ícone para "Modificar IP" -->
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
-
 
     <!-- MDB JS -->
     <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
 
-{# Footer #}
+    {# Footer #}
     <footer class="footer bg-dark text-white">
       <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
