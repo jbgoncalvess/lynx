@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from apps.api.models import ContainerLxcList, CurrentCount
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+import subprocess
 import re
 
 
@@ -39,3 +41,67 @@ def containers_view(request):
         'ult_reg': ult_reg,
     })
 
+
+@login_required
+def start_container(request, container_name):
+    try:
+        container = ContainerLxcList.objects.get(container_name=container_name)
+        if container.status != 'RUNNING':
+            command = f"lxc start {container_name}"
+            subprocess.run(command, check=True)
+
+            # Atualiza o 'status' no banco de dados
+            container.status = 'RUNNING'
+            container.save()
+
+            return JsonResponse({'status': 'success', 'message': f'Container {container_name} iniciado com sucesso!'})
+        else:
+            return JsonResponse({'status': 'info', 'message': f'Container {container_name} já está em execução!'})
+
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro ao iniciar o container {container_name}: {str(e)}'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+
+
+@login_required
+def stop_container(request, container_name):
+    try:
+        container = ContainerLxcList.objects.get(container_name=container_name)
+        if container.status == 'RUNNING':
+            command = f"lxc stop {container_name}"
+            subprocess.run(command, check=True)
+
+            # Atualiza o 'status' no banco de dados
+            container.status = 'STOPPED'
+            container.save()
+
+            return JsonResponse({'status': 'success', 'message': f'Container {container_name} parado com sucesso!'})
+        else:
+            return JsonResponse({'status': 'info', 'message': f'Container {container_name} já está parado!'})
+
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro ao parar o container {container_name}: {str(e)}'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+
+
+@login_required
+def restart_container(request, container_name):
+    try:
+        container = ContainerLxcList.objects.get(container_name=container_name)
+        if container.status == 'RUNNING':
+            command = f"lxc restart {container_name}"
+            subprocess.run(command, check=True)
+
+            return JsonResponse({'status': 'success', 'message': f'Container {container_name} reiniciado com sucesso!'})
+        else:
+            return JsonResponse({'status': 'info', 'message': f'Container {container_name} está parado!'})
+
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro ao reiniciar o container {container_name}: {str(e)}'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})

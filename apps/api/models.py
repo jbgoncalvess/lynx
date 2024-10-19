@@ -67,5 +67,5 @@ class ContainerIP(models.Model):
     interface = models.CharField(max_length=30)  # interface de rede a qual aquele ip está atribuído
     ip_type = models.CharField(max_length=4, choices=IP_TYPE_CHOICES)
 
-    def __str__(self):  # Dois underscores antes e depois
+    def __str__(self):
         return f"IP {self.ip_address} ({self.ip_type}){self.interface} for container {self.container.container_name}"
