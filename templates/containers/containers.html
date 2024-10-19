@@ -15,7 +15,6 @@
 
 
 {# Body #}
-<body>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white" style="width: 250px; height: 100vh;">
@@ -158,11 +157,12 @@
     <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
+    <!-- Requisição AJAX para o back-end, interagir com os botões "start", "stop" e "restart" -->
+    <script src="{% static 'containers/Ajax.js' %}"></script>
 
     {# Footer #}
     <footer class="footer bg-dark text-white">
       <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
 
-</body>
 </html>
