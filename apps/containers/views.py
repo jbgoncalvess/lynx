@@ -44,44 +44,60 @@ def containers_view(request):
     })
 
 
+# Função para criar o cliente SSH (Redução de tamanho de código)
+def create_client_ssh():
+    ip_server = '192.168.2.110'
+    user_server = 'lynx'
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ip_server, username=user_server)
+    return client
+
+
 @login_required
 def start_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status != 'RUNNING':
-            ip_server = '192.168.2.110'
-            user_server = 'lynx'
-            # rsa_priv = 'static/rsa_key/id_rsa'
-            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
+            # Função para criar o cliente SSH
+            client = create_client_ssh()
+            try:
+                command = f"lxc start {container_name}"
+                stdin, stdout, stderr = client.exec_command(command)
 
-            # Criar o cliente SSH
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(ip_server, username=user_server)
+                # output = stdout.read().decode()
+                error = stderr.read().decode()
 
-            command = f"lxc start {container_name}"
-            stdin, stdout, stderr = client.exec_command(command)
+                # if output:
+                #     print(f"Output: {output}")
+                if error:
+                    print(f"Error: {error}")
 
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-
-            if output:
-                print(f"Output: {output}")
-            if error:
-                print(f"Error: {error}")
-
-            if not error:
-                # Atualiza o 'status' no banco de dados
-                container.status = 'RUNNING'
-                container.save()
-
-            return JsonResponse({'status': 'success', 'message': f'Container {container_name} iniciado com sucesso!'})
+                # Somente atualiza o status se não houver erros
+                if not error:
+                    container.status = 'RUNNING'
+                    container.save()
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'Container {container_name} iniciado com sucesso!'
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f'Erro ao iniciar o container: {error}'
+                    })
+            finally:
+                # Fechar a conexão SSH
+                client.close()
         else:
-            return JsonResponse({'status': 'info', 'message': f'Container {container_name} já está em execução!'})
+            return JsonResponse({
+                'status': 'info',
+                'message': f'Container {container_name} já está em execução!'
+            })
 
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro ao iniciar o container {container_name}: {str(e)}'})
+    except paramiko.SSHException as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
@@ -92,38 +108,44 @@ def stop_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status == 'RUNNING':
-            ip_server = '192.168.2.110'
-            user_server = 'lynx'
-            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
+            # Função para criar o cliente SSH
+            client = create_client_ssh()
+            try:
+                command = f"lxc stop {container_name}"
+                stdin, stdout, stderr = client.exec_command(command)
 
-            # Criar o cliente SSH
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(ip_server, username=user_server)
+                # output = stdout.read().decode()
+                error = stderr.read().decode()
 
-            command = f"lxc stop {container_name}"
-            stdin, stdout, stderr = client.exec_command(command)
+                # if output:
+                #     print(f"Output: {output}")
+                if error:
+                    print(f"Error: {error}")
 
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-
-            if output:
-                print(f"Output: {output}")
-            if error:
-                print(f"Error: {error}")
-
-            if not error:
-                # Atualiza o 'status' no banco de dados
-                container.status = 'STOPPED'
-                container.save()
-
-            return JsonResponse({'status': 'success', 'message': f'Container {container_name} parado com sucesso!'})
+                # Somente atualiza o status se não houver erros
+                if not error:
+                    container.status = 'STOPPED'
+                    container.save()
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'Container {container_name} parado com sucesso!'
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f'Erro ao parar o container: {error}'
+                    })
+            finally:
+                # Fechar a conexão SSH
+                client.close()
         else:
-            return JsonResponse({'status': 'info', 'message': f'Container {container_name} já está parado!'})
+            return JsonResponse({
+                'status': 'info',
+                'message': f'Container {container_name} já está parado!'
+            })
 
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro ao parar o container {container_name}: {str(e)}'})
+    except paramiko.SSHException as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
@@ -134,33 +156,43 @@ def restart_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status == 'RUNNING':
-            ip_server = '192.168.2.110'
-            user_server = 'lynx'
-            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
+            # Função para criar o cliente SSH
+            client = create_client_ssh()
+            try:
+                command = f"lxc restart {container_name}"
+                stdin, stdout, stderr = client.exec_command(command)
 
-            # Criar o cliente SSH
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(ip_server, username=user_server)
+                # output = stdout.read().decode()
+                error = stderr.read().decode()
 
-            command = f"lxc restart {container_name}"
-            stdin, stdout, stderr = client.exec_command(command)
+                # if output:
+                #     print(f"Output: {output}")
+                if error:
+                    print(f"Error: {error}")
 
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-
-            if output:
-                print(f"Output: {output}")
-            if error:
-                print(f"Error: {error}")
-
-            return JsonResponse({'status': 'success', 'message': f'Container {container_name} reiniciado com sucesso!'})
+                # Somente atualiza o status se não houver erros
+                if not error:
+                    # Não atualizo o container.status, pois se reiniciou correto ele esta rodando
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'Container {container_name} reiniciado com sucesso!'
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f'Erro ao reiniciar o container: {error}'
+                    })
+            finally:
+                # Fechar a conexão SSH
+                client.close()
         else:
-            return JsonResponse({'status': 'info', 'message': f'Container {container_name} está parado!'})
+            return JsonResponse({
+                'status': 'info',
+                'message': f'Container {container_name} está parado, por isso não é possível reiniciá-lo!'
+            })
 
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro ao reiniciar o container {container_name}: {str(e)}'})
+    except paramiko.SSHException as e:
+        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
