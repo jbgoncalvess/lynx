@@ -71,7 +71,7 @@ def start_container(request, container_name):
             if error:
                 print(f"Error: {error}")
 
-            if error is None:
+            if not error:
                 # Atualiza o 'status' no banco de dados
                 container.status = 'RUNNING'
                 container.save()
@@ -113,7 +113,7 @@ def stop_container(request, container_name):
             if error:
                 print(f"Error: {error}")
 
-            if error is None:
+            if not error:
                 # Atualiza o 'status' no banco de dados
                 container.status = 'STOPPED'
                 container.save()
