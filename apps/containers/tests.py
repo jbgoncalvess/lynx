@@ -20,7 +20,7 @@ def start_container(container_name="c1"):
     try:
         # Configurações para a conexão SSH
         remote_ip = '192.168.2.110'  # Endereço IP da máquina remota
-        ssh_username = 'jardel'  # Nome de usuário SSH
+        ssh_username = 'lynx'  # Nome de usuário SSH - Criar no servidor um usuário para o software
         # ssh_key_path = '/caminho/para/sua/chave_privada'  # Caminho para a chave privada
 
         # Cria um cliente SSH

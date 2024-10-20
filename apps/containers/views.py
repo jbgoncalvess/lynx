@@ -1,9 +1,12 @@
-from django.shortcuts import render
-from apps.api.models import ContainerLxcList, CurrentCount
+import paramiko
+import re
+import subprocess
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-import subprocess
-import re
+from django.shortcuts import render
+
+from apps.api.models import ContainerLxcList, CurrentCount
 
 
 def natural_key(container):
@@ -12,7 +15,6 @@ def natural_key(container):
 
 @login_required
 def containers_view(request):
-
     ult_reg = CurrentCount.objects.order_by('-time').first()
     # Ordena os containers pelo nome
     containers = sorted(ContainerLxcList.objects.all(), key=natural_key)
@@ -47,12 +49,32 @@ def start_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status != 'RUNNING':
-            command = f"lxc start {container_name}"
-            subprocess.run(command, check=True)
+            ip_server = '192.168.2.110'
+            user_server = 'lynx'
+            # rsa_priv = 'static/rsa_key/id_rsa'
+            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
 
-            # Atualiza o 'status' no banco de dados
-            container.status = 'RUNNING'
-            container.save()
+            # Criar o cliente SSH
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(ip_server, username=user_server)
+
+            command = f"lxc start {container_name}"
+            stdin, stdout, stderr = client.exec_command(command)
+
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+
+            if output:
+                print(f"Output: {output}")
+            if error:
+                print(f"Error: {error}")
+
+            if error is None:
+                # Atualiza o 'status' no banco de dados
+                container.status = 'RUNNING'
+                container.save()
 
             return JsonResponse({'status': 'success', 'message': f'Container {container_name} iniciado com sucesso!'})
         else:
@@ -70,12 +92,31 @@ def stop_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status == 'RUNNING':
-            command = f"lxc stop {container_name}"
-            subprocess.run(command, check=True)
+            ip_server = '192.168.2.110'
+            user_server = 'lynx'
+            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
 
-            # Atualiza o 'status' no banco de dados
-            container.status = 'STOPPED'
-            container.save()
+            # Criar o cliente SSH
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(ip_server, username=user_server)
+
+            command = f"lxc stop {container_name}"
+            stdin, stdout, stderr = client.exec_command(command)
+
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+
+            if output:
+                print(f"Output: {output}")
+            if error:
+                print(f"Error: {error}")
+
+            if error is None:
+                # Atualiza o 'status' no banco de dados
+                container.status = 'STOPPED'
+                container.save()
 
             return JsonResponse({'status': 'success', 'message': f'Container {container_name} parado com sucesso!'})
         else:
@@ -93,8 +134,26 @@ def restart_container(request, container_name):
     try:
         container = ContainerLxcList.objects.get(container_name=container_name)
         if container.status == 'RUNNING':
+            ip_server = '192.168.2.110'
+            user_server = 'lynx'
+            # A chave privada na teoria não será preciso adicionar manualmente, pois ele ja pega a rsa_key do sistema
+
+            # Criar o cliente SSH
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(ip_server, username=user_server)
+
             command = f"lxc restart {container_name}"
-            subprocess.run(command, check=True)
+            stdin, stdout, stderr = client.exec_command(command)
+
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+
+            if output:
+                print(f"Output: {output}")
+            if error:
+                print(f"Error: {error}")
 
             return JsonResponse({'status': 'success', 'message': f'Container {container_name} reiniciado com sucesso!'})
         else:

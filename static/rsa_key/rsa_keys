@@ -60,3 +60,5 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC4kgwbI5ijO91AJmJ6/xMndekHtFJ07dD8/QytS+5w
 
 Utilizar o ssh-keygen para gerar as chaves na máquina onde se hospederá o software.
 Tutorial bom link: https://phoenixnap.com/kb/ssh-with-key
+
+Após criar o usuário "lynx", devo adicioná-lo ao grupo do lxd e em seguida atualizar a sessão com "newgrp lxd"

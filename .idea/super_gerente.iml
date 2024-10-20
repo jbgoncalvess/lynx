@@ -21,6 +21,10 @@
     <orderEntry type="library" name="font-awesome" level="application" />
     <orderEntry type="library" name="mdb-ui-kit" level="application" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="modifyBaseFiles" value="true" />
+    <option name="keepMatchingSpecifier" value="false" />
+  </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">

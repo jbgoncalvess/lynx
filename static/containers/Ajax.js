@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Função genérica para iniciar, parar ou reiniciar containers
+    // Função para iniciar, parar ou reiniciar containers
     function handleContainerAction(buttonClass, urlBase) {
         document.querySelectorAll(buttonClass).forEach(button => {
             button.addEventListener('click', function() {
