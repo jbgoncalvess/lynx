@@ -23,5 +23,5 @@ urlpatterns = [
     path('', include('apps.contas.urls')),
     path('', include('apps.containers.urls')),
     path('', include('apps.dashboard.urls')),
-    path('', include('apps.api.urls'))
+    path('', include('apps.api.urls')),
 ]
