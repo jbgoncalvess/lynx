@@ -1,3 +1,15 @@
+
+// Mostra o overlay
+function showLoadingOverlay() {
+        document.getElementById('loading-overlay').style.display = 'flex'; // Mostra o overlay
+    }
+
+// Esconde o overlay
+function hideLoadingOverlay() {
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Função para iniciar, parar ou reiniciar containers
     function handleContainerAction(buttonClass, urlBase) {
@@ -5,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function() {
                 const containerName = this.getAttribute('data-container-name');
 
+                // Se qualquer botão for ativado, eu ja exibo a tela de carregamento
+                showLoadingOverlay();
                 fetch(`/${urlBase}/${containerName}/`, {
                     method: 'GET',
                     headers: {
@@ -15,7 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     alert(data.message);  // Mostra a mensagem retornada (sucesso ou erro)
                 })
-                .catch(error => console.error('Erro:', error));
+                .catch(error => {
+                    console.error('Erro:', error);
+                })
+                .finally(() => {
+                    hideLoadingOverlay();  // Sempre esconder o overlay, independentemente do resultado
+                });
             });
         });
     }

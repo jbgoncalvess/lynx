@@ -1,6 +1,5 @@
 import paramiko
 import re
-import subprocess
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -46,7 +45,7 @@ def containers_view(request):
 
 # Função para criar o cliente SSH (Redução de tamanho de código)
 def create_client_ssh():
-    ip_server = '192.168.2.105'
+    ip_server = '192.168.2.104'
     user_server = 'lynx'
     client = paramiko.SSHClient()
     client.load_system_host_keys()
