@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lynx</title>
     <!-- MDB CSS -->
-    <link href="{% static 'mdbootstrap/mdb.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/mdb.min.css' %}" rel="stylesheet">
     <!-- CSS personalizado -->
     <link href="{% static 'home/base.css' %}" rel="stylesheet">
     <!-- CSS personalizado para loading-overview -->
@@ -70,111 +70,162 @@
         </div>
     </aside>
 
-
     {# Main #}
     <main class="content">
-    <div class="container-fluid"> <!-- Usando container-fluid para maior largura -->
-        <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
-            <i class="fas fa-box me-2"></i> CONTAINERS
-        </h1>
+        <div class="container-fluid"> <!-- Usando container-fluid para maior largura -->
+            <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
+                <i class="fas fa-box me-2"></i> CONTAINERS
+            </h1>
 
-        <!-- Lista de informações -->
-        <ul class="list-group bg-primary rounded text-white mb-2">
-            {% if ult_reg %}
-                <li class="p-1 d-flex justify-content-between align-items-center">
-                    <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
-                    <span>Data e Hora da última atualização: <strong>{{ ult_reg.time|date:"d/m/Y H:i:s" }}</strong></span>
-                </li>
-            {% else %}
-                <li class="list-group-item">Não há dados disponíveis.</li>
-            {% endif %}
-        </ul>
+            <!-- Lista de informações -->
+            <ul class="list-group bg-primary rounded text-white mb-2">
+                {% if ult_reg %}
+                    <li class="p-1 d-flex justify-content-between align-items-center">
+                        <span>Total de containers ativos: <strong>{{ ult_reg.container_count }}</strong></span>
+                        <span>Data e Hora da última atualização: <strong>{{ ult_reg.time|date:"d/m/Y H:i:s" }}</strong></span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Não há dados disponíveis.</li>
+                {% endif %}
+            </ul>
 
-        <!-- Tabela de containers -->
-        <div class="table-responsive border border-primary border-5 rounded mb-2"> <!-- Adicionado div com rounded -->
-            <table class="table table-striped bg-light mb-1 align-middle text-center">
-                <thead class="bg-primary text-white">
-                    <tr>
-                        <th>Nome do Container</th>
-                        <th>Status</th>
-                        <th>IPv4</th>
-                        <th>IPv6</th>
-                        <th>Iniciar</th>
-                        <th>Parar</th>
-                        <th>Reiniciar</th>
-                        <th>Modificar IP</th>
-                    </tr>
-                </thead>
+            <!-- Tabela de containers -->
+            <div class="table-responsive border border-primary border-5 rounded mb-2"> <!-- Adicionado div com rounded -->
+                <table class="table table-striped bg-light mb-1 align-middle text-center">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>Nome do Container</th>
+                            <th>Status</th>
+                            <th>IPv4</th>
+                            <th>IPv6</th>
+                            <th>Iniciar</th>
+                            <th>Parar</th>
+                            <th>Reiniciar</th>
+                            <th>Adicionar endereço IP</th>
+                            <th>Remover endereço IP</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    {% for container_name, status, ips in container_data %}
-                    <tr>
-                        <td>{{ container_name }}</td>
-                        <td>{{ status }}</td>
-                        <td>
-                            {% for ip in ips %}
-                                {% if ip.ip_type == 'IPv4' %}
-                                    <span>{{ ip.ip_address }} {{ ip.interface }}</span><br>
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for ip in ips %}
-                                {% if ip.ip_type == 'IPv6' %}
-                                    <span>{{ ip.ip_address }} {{ ip.interface }}</span><br>
-                                {% endif %}
-                            {% endfor %}
-                        </td>
+                    <tbody>
+                        {% for container_name, status, ips in container_data %}
+                        <tr>
+                            <td>{{ container_name }}</td>
+                            <td>{{ status }}</td>
+                            <td>
+                                {% for ip in ips %}
+                                    {% if ip.ip_type == 'IPv4' %}
+                                        <span>{{ ip.ip_address }} {{ ip.interface }}</span><br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for ip in ips %}
+                                    {% if ip.ip_type == 'IPv6' %}
+                                        <span>{{ ip.ip_address }} {{ ip.interface }}</span><br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
 
-                        <!-- Botões de ação -->
-                        <td>
-                            <button type="button" class="btn btn-link btn-sm px-3 start-container-btn" data-container-name="{{ container_name }}">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-link btn-sm px-3 stop-container-btn" data-container-name="{{ container_name }}">
-                                <i class="fas fa-stop"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-link btn-sm px-3 restart-container-btn" data-container-name="{{ container_name }}">
-                                <i class="fas fa-redo"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-link btn-sm px-3">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            <!-- Botões de ação -->
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 start-container-btn" data-container-name="{{ container_name }}">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 stop-container-btn" data-container-name="{{ container_name }}">
+                                    <i class="fas fa-stop"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 restart-container-btn" data-container-name="{{ container_name }}">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 adicionar-ip-btn" data-container-name="{{ container_name }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 remover-ip-btn" data-container-name="{{ container_name }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!-- Overlay de Carregamento usando MDBootstrap Spinner -->
-    <div id="loading-overlay">
-        <div class="spinner-grow text-primary" role="status">
-            <span class="visually-hidden">Carregando...</span>
+        <!-- Overlay de Carregamento usando MDBootstrap Spinner -->
+        <div id="loading-overlay">
+            <div class="spinner-grow text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
         </div>
-    </div>
 
-</main>
+        <!-- Estrutura do Modal -->
+        <div class="modal fade" id="modalIpActions" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Ação de IP</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Conteúdo do modal (formulário de interface, tipo de IP e IP Address) -->
+                        <form id="ipActionForm">
+                            <div class="mb-3">
+                                <label for="interface" class="form-label">Escolha a Interface</label>
+                                <select class="form-select" id="interface" required>
+                                    <option value="" disabled selected>Selecione a Interface</option>
+                                    <option value="eth0">eth0</option>
+                                    <option value="eth1">eth1</option>
+                                    <!-- Outras interfaces -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ipType" class="form-label">Tipo de IP</label>
+                                <select class="form-select" id="ipType" required>
+                                    <option value="" disabled selected>Selecione o Tipo de IP</option>
+                                    <option value="IPv4">IPv4</option>
+                                    <option value="IPv6">IPv6</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ipAddress" class="form-label">Endereço IP</label>
+                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o IP" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-rounded btn-warning" data-mdb-dismiss="modal">Fechar</button>
+                        <button type="button" id="saveIpAction" class="btn btn-rounded btn-primary">Salvar alterações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
 
-    <!-- MDB JS -->
-    <script src="{% static 'mdbootstrap/mdb.min.js' %}"></script>
+    <!-- MDBootstrap -->
+    <script src="{% static 'bootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
-    <script src="{% static 'mdbootstrap/fontawesome.js' %}"></script>
+    <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
     <!-- Requisição AJAX para o back-end, interagir com os botões "start", "stop" e "restart" -->
     <script src="{% static 'containers/Ajax.js' %}"></script>
+    <!-- Modal para adicionar ou remover endereços IPs -->
+    <script src="{% static '/containers/modal.js' %}"></script>
 
 
     {# Footer #}
     <footer class="footer bg-dark text-white">
       <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
-{#    a#}
+
 </html>

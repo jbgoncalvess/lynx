@@ -1,9 +1,12 @@
+import json
+
 import paramiko
 import re
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from apps.api.models import ContainerLxcList, CurrentCount
 
@@ -195,3 +198,23 @@ def restart_container(request, container_name):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+
+
+@csrf_exempt  # Desativa a verificação de CSRF para esta view
+def add_ip(request, container_name):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        interface = data.get('interface')
+        ip_type = data.get('ip_type')
+        # Lógica para adicionar o IP ao container aqui
+        return JsonResponse({'message': 'IP adicionado com sucesso!'})
+
+
+@csrf_exempt  # Desativa a verificação de CSRF para esta view
+def remove_ip(request, container_name):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        interface = data.get('interface')
+        ip_type = data.get('ip_type')
+        # Lógica para remover o IP do container aqui
+        return JsonResponse({'message': 'IP removido com sucesso!'})
