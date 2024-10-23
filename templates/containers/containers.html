@@ -143,12 +143,17 @@
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 adicionar-ip-btn" data-container-name="{{ container_name }}">
+                                <button type="button" class="btn btn-link btn-sm px-3 add-ip-btn"
+                                        data-container-name="{{ container_name }}"
+                                        data-interfaces="{% for ip in ips %}{{ ip.interface }}{% if not forloop.last %},{% endif %}{% endfor %}">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 remover-ip-btn" data-container-name="{{ container_name }}">
+                                 <button type="button" class="btn btn-link btn-sm px-3 remove-ip-btn"
+                                        data-container-name="{{ container_name }}"
+                                        data-interfaces="{% for ip in ips %}{{ ip.interface }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                                        data-ips="{% for ip in ips %}{{ ip.ip_address }}{% if not forloop.last %},{% endif %}{% endfor %}">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </td>
@@ -171,44 +176,40 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">Ação de IP</h5>
+                        <h5 class="modal-title" id="modalLabel">Adicionar/Remover IP</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Conteúdo do modal (formulário de interface, tipo de IP e IP Address) -->
-                        <form id="ipActionForm">
+                        <form>
                             <div class="mb-3">
-                                <label for="interface" class="form-label">Escolha a Interface</label>
-                                <select class="form-select" id="interface" required>
-                                    <option value="" disabled selected>Selecione a Interface</option>
-                                    <option value="eth0">eth0</option>
-                                    <option value="eth1">eth1</option>
-                                    <!-- Outras interfaces -->
-                                </select>
+                                <label for="interface" class="form-label">Interface</label>
+                                <select class="form-select" id="interface"></select>
                             </div>
-
                             <div class="mb-3">
                                 <label for="ipType" class="form-label">Tipo de IP</label>
-                                <select class="form-select" id="ipType" required>
-                                    <option value="" disabled selected>Selecione o Tipo de IP</option>
-                                    <option value="IPv4">IPv4</option>
-                                    <option value="IPv6">IPv6</option>
+                                <select class="form-select" id="ipType">
+                                    <option value="ipv4">IPv4</option>
+                                    <option value="ipv6">IPv6</option>
                                 </select>
                             </div>
-
-                            <div class="mb-3">
+                            <div class="mb-3" id="ipAddressSelectContainer" style="display: none;">
+                                <label for="ipAddressSelect" class="form-label">Selecionar IP para Remover</label>
+                                <select class="form-select" id="ipAddressSelect"></select>
+                            </div>
+                            <div class="mb-3" id="ipAddressAdd" style="display: block">
                                 <label for="ipAddress" class="form-label">Endereço IP</label>
-                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o IP" required>
+                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o IP">
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-rounded btn-warning" data-mdb-dismiss="modal">Fechar</button>
-                        <button type="button" id="saveIpAction" class="btn btn-rounded btn-primary">Salvar alterações</button>
+                        <button type="button" class="btn btn-rounded btn-primary" id="saveIpAction">Adicionar/Remover IP</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </main>
 

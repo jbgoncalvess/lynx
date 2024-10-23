@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP
 from django.utils import timezone
 import json
+import re
 
 
 @csrf_exempt
@@ -44,7 +45,7 @@ def data_lxc_list(request):
                 # Adiciono endereços IPv4. Avança a cada 2, já que recebo os dados "IPV4, interface".
                 for i in range(0, len(ipv4_list), 2):  # A lista de ipv4 alterna entre IP e interface
                     ip_address = ipv4_list[i]
-                    interface = ipv4_list[i + 1]  # A interface está no índice seguinte
+                    interface = re.sub(r'[()]', '', ipv4_list[i + 1])
                     ContainerIP.objects.create(
                         container=container,
                         ip_address=ip_address,
@@ -55,7 +56,7 @@ def data_lxc_list(request):
                 # Adiciono endereços IPV6. Avança a cada 2, já que recebo os dados "IPV6, interface".
                 for i in range(0, len(ipv6_list), 2):  # A lista de ipv6 alterna entre IP e interface
                     ip_address = ipv6_list[i]
-                    interface = ipv6_list[i + 1]  # A interface está no índice seguinte
+                    interface = re.sub(r'[()]', '', ipv6_list[i + 1])  # A interface está no índice seguinte
                     ContainerIP.objects.create(
                         container=container,
                         ip_address=ip_address,
@@ -179,7 +180,6 @@ def metrics_containers(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método não permitido'}, status=405)
-
 
 #######################################################################################################################
 #######################################################################################################################

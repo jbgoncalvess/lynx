@@ -39,6 +39,7 @@ def containers_view(request):
         # Adiciona o container e seus respectivos dados (nome, status, IPs) na lista
         container_data.append((container.container_name, container.status, ips_data))
 
+    print(container_data)
     # Envia os dados como contexto para o template
     return render(request, 'containers/containers.html', {
         'container_data': container_data,
@@ -48,7 +49,7 @@ def containers_view(request):
 
 # Função para criar o cliente SSH (Redução de tamanho de código)
 def create_client_ssh():
-    ip_server = '192.168.2.104'
+    ip_server = '192.168.2.103'
     user_server = 'lynx'
     client = paramiko.SSHClient()
     client.load_system_host_keys()
