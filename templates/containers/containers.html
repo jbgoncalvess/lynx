@@ -101,8 +101,8 @@
                             <th>Iniciar</th>
                             <th>Parar</th>
                             <th>Reiniciar</th>
-                            <th>Adicionar endereço IP</th>
-                            <th>Remover endereço IP</th>
+                            <th>Trocar endereço IPv4</th>
+                            <th>Remover endereço IP (v4 ou v6)</th>
                         </tr>
                     </thead>
 
@@ -185,7 +185,7 @@
                                 <label for="interface" class="form-label">Interface</label>
                                 <select class="form-select" id="interface"></select>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="ipTypeSelect" style="display: none;">
                                 <label for="ipType" class="form-label">Tipo de IP</label>
                                 <select class="form-select" id="ipType">
                                     <option value="ipv4">IPv4</option>
@@ -197,8 +197,8 @@
                                 <select class="form-select" id="ipAddressSelect"></select>
                             </div>
                             <div class="mb-3" id="ipAddressAdd" style="display: block">
-                                <label for="ipAddress" class="form-label">Endereço IP</label>
-                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o IP">
+                                <label for="ipAddress" class="form-label">Endereço IPv4</label>
+                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o endereço IP">
                             </div>
                         </form>
                     </div>

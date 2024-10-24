@@ -49,7 +49,7 @@ def containers_view(request):
 
 # Função para criar o cliente SSH (Redução de tamanho de código)
 def create_client_ssh():
-    ip_server = '192.168.2.103'
+    ip_server = '192.168.2.102'
     user_server = 'lynx'
     client = paramiko.SSHClient()
     client.load_system_host_keys()
@@ -204,18 +204,39 @@ def restart_container(request, container_name):
 @csrf_exempt  # Desativa a verificação de CSRF para esta view
 def add_ip(request, container_name):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        interface = data.get('interface')
-        ip_type = data.get('ip_type')
-        # Lógica para adicionar o IP ao container aqui
-        return JsonResponse({'message': 'IP adicionado com sucesso!'})
+        try:
+            data = json.loads(request.body)
+            interface = data.get('interface')
+            ip_type = data.get('ip_type')
+            ip_type = ip_type.lower()
+            ipaddress = data.get('ipaddress')
+            # client = create_client_ssh()
+            # try:
+            #     command = f"lxc config device set {container_name} {interface} {ip_type}.address {ipaddress}"
+
+            return JsonResponse({'message': 'IP adicionado com sucesso!'})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+    else:
+        return JsonResponse({"error": "Método não permitido."}, status=405)
 
 
 @csrf_exempt  # Desativa a verificação de CSRF para esta view
 def remove_ip(request, container_name):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        interface = data.get('interface')
-        ip_type = data.get('ip_type')
-        # Lógica para remover o IP do container aqui
-        return JsonResponse({'message': 'IP removido com sucesso!'})
+        try:
+            data = json.loads(request.body)
+            interface = data.get('interface')
+            ip_type = data.get('ip_type')
+            ipaddress = data.get('ipaddress')
+
+            return JsonResponse({'message': 'IP removido com sucesso!'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+    else:
+        return JsonResponse({"error": "Método não permitido."}, status=405)

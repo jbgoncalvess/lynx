@@ -31,17 +31,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const saveButton = document.getElementById('saveIpAction');
         const ipAddressInput = document.getElementById('ipAddressAdd')
         const ipAddressSelectContainer = document.getElementById('ipAddressSelectContainer')
+        const ipTypeSelect = document.getElementById('ipTypeSelect')
+
         // Muda o título e o texto do botão dependendo da ação (adicionar/remover)
         if (actionType === 'add') {
-            modalTitle.textContent = `Adicionar IP ao container ${containerName}`;
-            saveButton.textContent = 'Adicionar IP';
+            modalTitle.textContent = `Trocar endereço IPv4 do container ${containerName}`;
+            saveButton.textContent = 'Adicionar IPv4';
             ipAddressInput.style.display = 'block'; // Mostrar input para adicionar IP
             ipAddressSelectContainer.style.display = 'none'; // Ocultar select de remoção de IP
+            ipTypeSelect.style.display = 'none';
         } else if (actionType === 'remove') {
             modalTitle.textContent = `Remover IP do container ${containerName}`;
             saveButton.textContent = 'Remover IP';
             ipAddressInput.style.display = 'none'; // Mostrar input para adicionar IP
             ipAddressSelectContainer.style.display = 'block'; // Ocultar select de remoção de IP
+            ipTypeSelect.style.display = 'block';
         }
 
 
@@ -53,16 +57,16 @@ document.addEventListener('DOMContentLoaded', function() {
         interfaceSelect.innerHTML = '';
 
         interfaceList = [...new Set(interfaceList)]
-        console.log(interfaceList)
 
         // Adicionar as interfaces como opções no select
         interfaceList.forEach(function(iface) {
-            console.log(iface)
             const option = document.createElement('option');
             option.value = iface;
             option.textContent = iface;
             interfaceSelect.appendChild(option);
         });
+        console.log(ipAddressSelectContainer)
+        console.log(ipAddressInput)
 
         // Caso seja uma ação de remoção de IP, também vamos popular o select de IPs
         if (actionType === 'remove') {
