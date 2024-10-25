@@ -1,15 +1,28 @@
+function showLoadingOverlay() {
+        document.getElementById('loading-overlay').style.display = 'flex'; // Mostra o overlay
+    }
+// Esconde o overlay
+function hideLoadingOverlay() {
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+function validationIpv4(ip){
+    const ipv4 = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    return ipv4.test(ip);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Selecionar todos os botões "Adicionar IP" e "Remover IP"
-    const addIpButtons = document.querySelectorAll('.add-ip-btn');
+    const swapIpButtons = document.querySelectorAll('.swap-ip-btn');
     const removeIpButtons = document.querySelectorAll('.remove-ip-btn');
 
     // Manipular clique no botão de adicionar IP
-    addIpButtons.forEach(button => {
+    swapIpButtons.forEach(button => {
         button.addEventListener('click', function() {
             const containerName = this.getAttribute('data-container-name');
             const interfaces = this.getAttribute('data-interfaces');
             const interfaceList = interfaces.split(',');
-            openIpModal(containerName, 'add', interfaceList);
+            openIpModal(containerName, 'swap-ip', interfaceList);
         });
     });
 
@@ -21,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const ips = this.getAttribute('data-ips');
             const interfaceList = interfaces.split(',');
             const ipList = ips.split(',');  // Transformar os IPs em uma lista
-            openIpModal(containerName, 'remove', interfaceList, ipList);
+            openIpModal(containerName, 'remove-ip', interfaceList, ipList);
         });
     });
 
@@ -29,18 +42,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function openIpModal(containerName, actionType, interfaceList, ipList = []) {
         const modalTitle = document.getElementById('modalLabel');
         const saveButton = document.getElementById('saveIpAction');
-        const ipAddressInput = document.getElementById('ipAddressAdd')
+        const ipAddressInput = document.getElementById('ipAddressSwap')
         const ipAddressSelectContainer = document.getElementById('ipAddressSelectContainer')
         const ipTypeSelect = document.getElementById('ipTypeSelect')
 
         // Muda o título e o texto do botão dependendo da ação (adicionar/remover)
-        if (actionType === 'add') {
+        if (actionType === 'swap-ip') {
             modalTitle.textContent = `Trocar endereço IPv4 do container ${containerName}`;
             saveButton.textContent = 'Adicionar IPv4';
             ipAddressInput.style.display = 'block'; // Mostrar input para adicionar IP
             ipAddressSelectContainer.style.display = 'none'; // Ocultar select de remoção de IP
             ipTypeSelect.style.display = 'none';
-        } else if (actionType === 'remove') {
+        } else if (actionType === 'remove-ip') {
             modalTitle.textContent = `Remover IP do container ${containerName}`;
             saveButton.textContent = 'Remover IP';
             ipAddressInput.style.display = 'none'; // Mostrar input para adicionar IP
@@ -50,10 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-        // Supondo que você tenha um select no modal com id "interface"
         const interfaceSelect = document.getElementById('interface');
 
-        // Limpar o select antes de adicionar novas opções
         interfaceSelect.innerHTML = '';
 
         interfaceList = [...new Set(interfaceList)]
@@ -69,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(ipAddressInput)
 
         // Caso seja uma ação de remoção de IP, também vamos popular o select de IPs
-        if (actionType === 'remove') {
+        if (actionType === 'remove-ip') {
             const ipSelect = document.getElementById('ipAddressSelect');  // Select de IPs no modal
 
             // Limpar o select de IPs antes de adicionar novas opções
@@ -101,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let ipAddress = '';
 
             // Se for uma ação de remoção, obter o IP selecionado no select de IPs
-            if (actionType === 'remove') {
+            if (actionType === 'remove-ip') {
                 ipAddress = document.getElementById('ipAddressSelect').value;
             } else {
                 // Se for uma ação de adição, pegar o IP digitado no campo de input
@@ -114,8 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            if (!(validationIpv4(ipAddress))) {
+                alert('Por favor, digita um IPv4 certo!');
+                return;
+            }
+
+            showLoadingOverlay()
             // Fazer a requisição via fetch para adicionar ou remover o IP
-            fetch(`/containers/${containerName}/ip/${saveButton.textContent === 'Adicionar IP' ? 'add' : 'remove'}/`, {
+            fetch(`/${actionType}/${containerName}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,6 +155,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Erro:', error);
                 alert('Ocorreu um erro ao processar a solicitação.');
                 ipModal.hide();  // Fechar o modal em caso de erro também
+            })
+            .finally(()=>{
+                hideLoadingOverlay()
             });
         });
     }

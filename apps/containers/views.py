@@ -49,7 +49,7 @@ def containers_view(request):
 
 # Função para criar o cliente SSH (Redução de tamanho de código)
 def create_client_ssh():
-    ip_server = '192.168.2.102'
+    ip_server = '192.168.2.103'
     user_server = 'lynx'
     client = paramiko.SSHClient()
     client.load_system_host_keys()
@@ -164,12 +164,8 @@ def restart_container(request, container_name):
             try:
                 command = f"lxc restart {container_name}"
                 stdin, stdout, stderr = client.exec_command(command)
-
-                # output = stdout.read().decode()
                 error = stderr.read().decode()
 
-                # if output:
-                #     print(f"Output: {output}")
                 if error:
                     print(f"Error: {error}")
 
@@ -201,42 +197,79 @@ def restart_container(request, container_name):
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
 
 
-@csrf_exempt  # Desativa a verificação de CSRF para esta view
-def add_ip(request, container_name):
-    if request.method == 'POST':
-        try:
+@csrf_exempt
+def swap_ip(request, container_name):
+    try:
+        if request.method == 'POST':
             data = json.loads(request.body)
+            # print("TESTANDO-swap")
             interface = data.get('interface')
-            ip_type = data.get('ip_type')
-            ip_type = ip_type.lower()
-            ipaddress = data.get('ipaddress')
-            # client = create_client_ssh()
-            # try:
-            #     command = f"lxc config device set {container_name} {interface} {ip_type}.address {ipaddress}"
+            ip_type = data.get('ip_type').lower()
+            ipaddress = data.get('ip_address')
 
-            return JsonResponse({'message': 'IP adicionado com sucesso!'})
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
-        except Exception as e:
-            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
-    else:
-        return JsonResponse({"error": "Método não permitido."}, status=405)
+            client = create_client_ssh()
+            try:
+                # print("TESTANDO-swap-2")
+                command = (f"lxc config device set {container_name} {interface} {ip_type}.address"
+                           f" {ipaddress} && lxc restart {container_name}")
+                _, _, stderr = client.exec_command(command)
+                error = stderr.read().decode()
+
+                if not error:
+                    # Aqui eu poderia trocar o endereço ip no DB, no entanto, eu deixo para a atualização do daemon que
+                    # roda no servidor a ser monitorado, pois assim eu evito ficar sobrecarregando o servidor
+                    return JsonResponse({'message': 'Endereço IPv4 trocado com sucesso!'})
+                else:
+                    return JsonResponse({'error': f'Erro ao adicionar o IPv4: {error}'})
+
+            except paramiko.SSHException as e:
+                return JsonResponse({"error": f"Erro de conexão SSH: {str(e)}"}, status=500)
+            finally:
+                client.close()
+
+        else:
+            return JsonResponse({"error": "Método não permitido."}, status=405)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
 
 
-@csrf_exempt  # Desativa a verificação de CSRF para esta view
+@csrf_exempt
 def remove_ip(request, container_name):
-    if request.method == 'POST':
-        try:
+    try:
+        if request.method == 'POST':
+            print("TESTANDO-remove")
             data = json.loads(request.body)
             interface = data.get('interface')
-            ip_type = data.get('ip_type')
-            ipaddress = data.get('ipaddress')
+            ip_type = data.get('ip_type').lower()
+            ipaddress = data.get('ip_address')
 
-            return JsonResponse({'message': 'IP removido com sucesso!'})
+            client = create_client_ssh()
+            try:
+                if ip_type == 'ipv4':
+                    pass
 
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
-        except Exception as e:
-            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
-    else:
-        return JsonResponse({"error": "Método não permitido."}, status=405)
+                else:
+                    pass
+
+                # command = f"lxc config device unset {container_name} {interface} {ip_type}.address"
+                # _, _, stderr = client.exec_command(command)
+                # error = stderr.read().decode()
+                #
+                # if not error:
+                #     return JsonResponse({'message': 'Endereço IPv4 removido com sucesso!'})
+                # else:
+                #     return JsonResponse({'error': f'Erro ao remover o IPv4: {error}'})
+
+            except paramiko.SSHException as e:
+                return JsonResponse({"error": f"Erro de conexão SSH: {str(e)}"}, status=500)
+            finally:
+                client.close()
+
+        else:
+            return JsonResponse({"error": "Método não permitido."}, status=405)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)

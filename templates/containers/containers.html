@@ -143,7 +143,7 @@
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 add-ip-btn"
+                                <button type="button" class="btn btn-link btn-sm px-3 swap-ip-btn"
                                         data-container-name="{{ container_name }}"
                                         data-interfaces="{% for ip in ips %}{{ ip.interface }}{% if not forloop.last %},{% endif %}{% endfor %}">
                                     <i class="fas fa-edit"></i>
@@ -196,7 +196,7 @@
                                 <label for="ipAddressSelect" class="form-label">Selecionar IP para Remover</label>
                                 <select class="form-select" id="ipAddressSelect"></select>
                             </div>
-                            <div class="mb-3" id="ipAddressAdd" style="display: block">
+                            <div class="mb-3" id="ipAddressSwap" style="display: block">
                                 <label for="ipAddress" class="form-label">Endereço IPv4</label>
                                 <input type="text" class="form-control" id="ipAddress" placeholder="Digite o endereço IP">
                             </div>
