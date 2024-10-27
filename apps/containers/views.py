@@ -253,6 +253,7 @@ def remove_ip(request, container_name):
                 else:
                     pass
 
+                print("VIEW REMOVE IP")
                 # command = f"lxc config device unset {container_name} {interface} {ip_type}.address"
                 # _, _, stderr = client.exec_command(command)
                 # error = stderr.read().decode()

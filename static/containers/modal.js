@@ -120,10 +120,23 @@ document.getElementById('saveIpAction').addEventListener('click', function() {
         return;
     }
 
-    if (!validationIpv4(ipAddress)) {
-        alert('Por favor, digite um IPv4 válido!');
+    console.log(selectedIpType)
+    // Se não for um IPv4 na hora de trocar IP, já está errado
+    if (!validationIpv4(ipAddress) && currentActionType === 'swap-ip') {
+        alert(`Por favor, digite um ${selectedIpType} válido!`);
         return;
     }
+    // Se não é adicionar IP, então é remover. Se IP for v4 e tipo v6 está errado
+    if (validationIpv4(ipAddress) && selectedIpType === 'ipv6') {
+        alert(`Por favor, escolha um endereço ${selectedIpType} condizente!`);
+        return;
+    }
+    // Se for remover, IP for v6 e tipo v4, está errado também
+    if (!validationIpv4(ipAddress) && selectedIpType === 'ipv4') {
+        alert(`Por favor, escolha um endereço ${selectedIpType} condizente!`);
+        return;
+    }
+
 
     showLoadingOverlay();
 
