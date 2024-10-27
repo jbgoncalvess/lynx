@@ -115,12 +115,6 @@ document.getElementById('saveIpAction').addEventListener('click', function() {
         ipAddress = document.getElementById('ipAddress').value;
     }
 
-    if (!selectedInterface || (currentActionType === 'remove-ip' && !selectedIpType) || !ipAddress) {
-        alert('Por favor, preencha todos os campos.');
-        return;
-    }
-
-    console.log(selectedIpType)
     // Se não for um IPv4 na hora de trocar IP, já está errado
     if (!validationIpv4(ipAddress) && currentActionType === 'swap-ip') {
         alert(`Por favor, digite um ${selectedIpType} válido!`);
