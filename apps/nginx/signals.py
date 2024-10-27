@@ -24,6 +24,7 @@ def previous_status(sender, instance, **kwargs):
         instance._ips_v4_anteriores = []
 
 
+# Atualizar os containers upstream que foram somente ligados e desligados
 @receiver(post_save, sender=ContainerLxcList)
 def update_upstream_status(sender, instance, **kwargs):
     # Captura os valores anteriores e atuais
@@ -32,7 +33,7 @@ def update_upstream_status(sender, instance, **kwargs):
 
     # Se status anterior é diferente do atual, chama update_upstream para atualizar os containers upstream do nginx
     if status_anterior != status_atual:
-        print("UPDATE_UPSTREAM FUNCIONANDO")
+        print("UPDATE_UPSTREAM FUNCIONANDO - MUDANÇA DE STATUS")
         containers_running = ContainerLxcList.objects.filter(status='RUNNING')
         update_upstream(containers_running)
 
@@ -53,7 +54,7 @@ def update_upstream_ip(sender, instance, **kwargs):
     # Comparar IPs e verificar se a função já foi executada para este evento, pois para cada vez que um endereço é
     # alterado, pode haver duplicidade. === Procurar melhoria
     if ipv4_anteriores != ipv4_atuais and not hasattr(container, '_upstream_updated'):
-        # print("UPDATE_UPSTREAM FUNCIONANDO - MUDANÇA EM ContainerIP")
+        print("UPDATE_UPSTREAM FUNCIONANDO - MUDANÇA EM ContainerIP")
         containers_running = ContainerLxcList.objects.filter(status='RUNNING')
         update_upstream(containers_running)
         # Flagzinha para caso ele ja tenha sido executado

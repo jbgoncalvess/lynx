@@ -67,13 +67,9 @@ def start_container(request, container_name):
             client = create_client_ssh()
             try:
                 command = f"lxc start {container_name}"
-                stdin, stdout, stderr = client.exec_command(command)
-
-                # output = stdout.read().decode()
+                _, _, stderr = client.exec_command(command)
                 error = stderr.read().decode()
 
-                # if output:
-                #     print(f"Output: {output}")
                 if error:
                     print(f"Error: {error}")
 
@@ -115,17 +111,13 @@ def stop_container(request, container_name):
             client = create_client_ssh()
             try:
                 command = f"lxc stop {container_name}"
-                stdin, stdout, stderr = client.exec_command(command)
+                _, _, stderr = client.exec_command(command)
 
-                # output = stdout.read().decode()
                 error = stderr.read().decode()
 
-                # if output:
-                #     print(f"Output: {output}")
                 if error:
                     print(f"Error: {error}")
 
-                # Somente atualiza o status se não houver erros
                 if not error:
                     container.status = 'STOPPED'
                     container.save()

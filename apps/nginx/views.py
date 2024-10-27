@@ -22,19 +22,19 @@ def update_upstream(containers_running):
 
     try:
         # Executa o comando para atualizar o arquivo de configuração via SSH
-        stdin, stdout, stderr = ssh_client.exec_command(command)
-        error_output = stderr.read().decode()
-        if error_output:
-            raise Exception(f"Erro ao atualizar o arquivo upstream: {error_output}")
+        _, _, stderr = ssh_client.exec_command(command)
+        error = stderr.read().decode()
+        if error:
+            raise Exception(f"Erro ao atualizar o arquivo upstream: {error}")
 
-        # Recarregar o Nginx (verificar a permissão do usuário lynx e modificar )
+        # Recarregar o Nginx (verificar a permissão do usuário lynx e modificar)
         comando_reload_nginx = 'sudo systemctl reload nginx'
 
         # Executa o comando de recarga do Nginx via SSH
-        stdin, stdout, stderr = ssh_client.exec_command(comando_reload_nginx)
-        error_output = stderr.read().decode()
-        if error_output:
-            raise Exception(f"Erro ao recarregar o Nginx: {error_output}")
+        _, _, stderr = ssh_client.exec_command(comando_reload_nginx)
+        error = stderr.read().decode()
+        if error:
+            raise Exception(f"Erro ao recarregar o Nginx: {error}")
 
         return True
 
