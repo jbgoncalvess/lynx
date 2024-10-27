@@ -4,7 +4,6 @@ from apps.containers.views import create_client_ssh
 # Função para atualizar os containers upstream de acordo com seus status
 def update_upstream(containers_running):
     # Criar o client SSH
-    print("UPDATE_UPSTREAM FUNCIONANDO")
     ssh_client = create_client_ssh()
 
     # Define o caminho do arquivo de configuração e o tipo de balanceamento de carga
