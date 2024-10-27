@@ -12,7 +12,7 @@
     <!-- CSS personalizado -->
     <link href="{% static 'home/base.css' %}" rel="stylesheet">
     <!-- CSS personalizado para loading-overview -->
-    <link href="{% static 'containers/loading-overlay.css' %}" rel="stylesheet">
+    <link href="{% static 'containers/loading_overlay.css' %}" rel="stylesheet">
 </head>
 
 
@@ -102,7 +102,7 @@
                             <th>Parar</th>
                             <th>Reiniciar</th>
                             <th>Trocar endereço IPv4</th>
-                            <th>Remover endereço IP (v4 ou v6)</th>
+                            <th>Endereçamento IPv6</th>
                         </tr>
                     </thead>
 
@@ -128,17 +128,20 @@
 
                             <!-- Botões de ação -->
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 start-container-btn" data-container-name="{{ container_name }}">
+                                <button type="button" class="btn btn-link btn-sm px-3 start-container-btn"
+                                        data-container-name="{{ container_name }}">
                                     <i class="fas fa-play"></i>
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 stop-container-btn" data-container-name="{{ container_name }}">
+                                <button type="button" class="btn btn-link btn-sm px-3 stop-container-btn"
+                                        data-container-name="{{ container_name }}">
                                     <i class="fas fa-stop"></i>
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 restart-container-btn" data-container-name="{{ container_name }}">
+                                <button type="button" class="btn btn-link btn-sm px-3 restart-container-btn"
+                                        data-container-name="{{ container_name }}">
                                     <i class="fas fa-redo"></i>
                                 </button>
                             </td>
@@ -150,11 +153,9 @@
                                 </button>
                             </td>
                             <td>
-                                 <button type="button" class="btn btn-link btn-sm px-3 remove-ip-btn"
-                                        data-container-name="{{ container_name }}"
-                                        data-interfaces="{% for ip in ips %}{{ ip.interface }}{% if not forloop.last %},{% endif %}{% endfor %}"
-                                        data-ips="{% for ip in ips %}{{ ip.ip_address }}{% if not forloop.last %},{% endif %}{% endfor %}">
-                                    <i class="fas fa-edit"></i>
+                                <button type="button" class="btn btn-link btn-sm px-3 toggle-config-btn"
+                                        data-container-name="{{ container_name }}">
+                                    <i class="fas fa-network-wired"></i>
                                 </button>
                             </td>
                         </tr>
@@ -171,45 +172,64 @@
             </div>
         </div>
 
-        <!-- Estrutura do Modal -->
+        <!-- Estrutura do Modal para Adicionar IPv4 -->
         <div class="modal fade" id="modalIpActions" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">Adicionar/Remover IP</h5>
+                        <h5 class="modal-title" id="modalLabel">Adicionar IPv4</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form>
+                            <!-- Seletor de Interface -->
                             <div class="mb-3">
                                 <label for="interface" class="form-label">Interface</label>
                                 <select class="form-select" id="interface"></select>
                             </div>
-                            <div class="mb-3" id="ipTypeSelect" style="display: none;">
-                                <label for="ipType" class="form-label">Tipo de IP</label>
-                                <select class="form-select" id="ipType">
-                                    <option value="ipv4">IPv4</option>
-                                    <option value="ipv6">IPv6</option>
-                                </select>
-                            </div>
-                            <div class="mb-3" id="ipAddressSelectContainer" style="display: none;">
-                                <label for="ipAddressSelect" class="form-label">Selecionar IP para Remover</label>
-                                <select class="form-select" id="ipAddressSelect"></select>
-                            </div>
-                            <div class="mb-3" id="ipAddressSwap" style="display: block">
+
+                            <!-- Campo para o Endereço IPv4 -->
+                            <div class="mb-3" id="ipAddressContainer">
                                 <label for="ipAddress" class="form-label">Endereço IPv4</label>
-                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o endereço IP">
+                                <input type="text" class="form-control" id="ipAddress" placeholder="Digite o endereço IPv4">
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-rounded btn-warning" data-mdb-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-rounded btn-primary" id="saveIpAction">Adicionar/Remover IP</button>
+                        <button type="button" class="btn btn-rounded btn-primary" id="saveIpAction">Adicionar IPv4</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Estrutura do Modal para Habilitar/Desabilitar IPv6 -->
+        <div class="modal fade" id="modalIpv6Toggle" tabindex="-1" aria-labelledby="modalIpv6Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalIpv6Label">Configurar IPv6</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <!-- Seletor para Habilitar ou Desabilitar IPv6 -->
+                            <div class="mb-3">
+                                <label for="ipv6Toggle" class="form-label">Ação IPv6</label>
+                                <select class="form-select" id="ipv6Toggle">
+                                    <option value="ativado">Habilitar IPv6</option>
+                                    <option value="desativado">Desabilitar IPv6</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-rounded btn-warning" data-mdb-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-rounded btn-primary" id="saveIpv6ToggleAction">Salvar Alterações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </main>
 
@@ -220,9 +240,10 @@
     <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
     <!-- Requisição AJAX para o back-end, interagir com os botões "start", "stop" e "restart" -->
     <script src="{% static 'containers/Ajax.js' %}"></script>
-    <!-- Modal para adicionar ou remover endereços IPs -->
-    <script src="{% static '/containers/modal.js' %}"></script>
-
+    <!-- Modal para trocar endereços IPv4 dos containers -->
+    <script src="{% static '/containers/modal_swap_ipv4.js' %}"></script>
+    <!-- Modal para habilitar ou não IPv6 -->
+    <script src="{% static '/containers/modal_toggle_ipv6.js' %}"></script>
 
     {# Footer #}
     <footer class="footer bg-dark text-white">

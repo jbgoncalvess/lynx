@@ -1,6 +1,6 @@
 import json
 
-import paramiko
+import paramiko, time
 import re
 
 from django.contrib.auth.decorators import login_required
@@ -202,9 +202,8 @@ def swap_ip(request, container_name):
     try:
         if request.method == 'POST':
             data = json.loads(request.body)
-            # print("TESTANDO-swap")
+            print("TESTANDO-swap")
             interface = data.get('interface')
-            ip_type = data.get('ip_type').lower()
             ipaddress = data.get('ip_address')
 
             client = create_client_ssh()
@@ -212,7 +211,7 @@ def swap_ip(request, container_name):
                 # print("TESTANDO-swap-2")
                 # Aqui vou ativar o signals do app nginx, assim ele vai remover o container que vai trocar de endereço
                 # ipv4 dos containers upstream
-                command = (f"lxc config device set {container_name} {interface} {ip_type}.address"
+                command = (f"lxc config device set {container_name} {interface} ipv4.address"
                            f" {ipaddress} && lxc restart {container_name}")
                 _, _, stderr = client.exec_command(command)
                 error = stderr.read().decode()
@@ -236,32 +235,53 @@ def swap_ip(request, container_name):
 
 
 @csrf_exempt
-def remove_ip(request, container_name):
+def toggle_ipv6(request, container_name):
     try:
         if request.method == 'POST':
-            print("TESTANDO-remove")
             data = json.loads(request.body)
-            interface = data.get('interface')
-            ip_type = data.get('ip_type').lower()
-            ipaddress = data.get('ip_address')
+            action_ipv6 = data.get('action')  # 'enable' ou 'disable'
 
-            client = create_client_ssh()
+            client = create_client_ssh()  # Função que cria uma conexão SSH
             try:
-                if ip_type == 'ipv4':
-                    pass
+                # Definindo o caminho do arquivo
+                file_path = "/etc/netplan/50-cloud-init.yaml"
+
+                if action_ipv6 == 'desativado':
+                    command = (
+                        f"lxc exec {container_name} -- /bin/bash -c \""
+                        f"sed -i '/accept-ra:/d; /dhcp4: true/ a\\"
+                        f"            accept-ra: false' {file_path}\""
+                    )
+
+                elif action_ipv6 == 'ativado':
+                    command = (
+                        f"lxc exec {container_name} -- /bin/bash -c \""
+                        f"sed -i '/accept-ra:/d; /dhcp4: true/ a\\"
+                        f"            accept-ra: true' {file_path}\""
+                    )
 
                 else:
-                    pass
+                    return JsonResponse({"error": "Ação inválida."}, status=400)
 
-                print("VIEW REMOVE IP")
-                # command = f"lxc config device unset {container_name} {interface} {ip_type}.address"
-                # _, _, stderr = client.exec_command(command)
-                # error = stderr.read().decode()
-                #
-                # if not error:
-                #     return JsonResponse({'message': 'Endereço IPv4 removido com sucesso!'})
-                # else:
-                #     return JsonResponse({'error': f'Erro ao remover o IPv4: {error}'})
+                # Executando o comando SSH
+                _, _, stderr = client.exec_command(command)
+                error = stderr.read().decode()
+
+                if not error:
+                    # Me forcei a usar o sleep, pois não sei porque não ta dando para usar o netplan apply.
+                    # Tem algo haver com ser container e não gerenciar tudo, em vez disso, restarto
+                    time.sleep(7.7)
+                    command_restart = f"lxc restart {container_name}"
+                    _, _, stderr_apply = client.exec_command(command_restart)
+                    error_apply = stderr_apply.read().decode()
+
+                    if not error_apply:
+                        return JsonResponse({'message': f'IPv6 {action_ipv6} com sucesso!'})
+                    else:
+                        return JsonResponse({'error': f'Erro ao aplicar mudanças no netplan: {error_apply}'})
+
+                else:
+                    return JsonResponse({'error': f'Erro ao alterar IPv6: {error}'})
 
             except paramiko.SSHException as e:
                 return JsonResponse({"error": f"Erro de conexão SSH: {str(e)}"}, status=500)
