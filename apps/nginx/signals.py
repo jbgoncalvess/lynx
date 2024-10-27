@@ -29,5 +29,5 @@ def atualizar_arquivo_nginx(sender, instance, **kwargs):
 
     if status_anterior != status_atual:
         print(status_atual)
-        containers_rodando = ContainerLxcList.objects.filter(status='RUNNING')
-        update_upstream(containers_rodando)
+        containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+        update_upstream(containers_running)

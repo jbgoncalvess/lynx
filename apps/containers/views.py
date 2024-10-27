@@ -49,7 +49,7 @@ def containers_view(request):
 
 # Função para criar o cliente SSH (Redução de tamanho de código)
 def create_client_ssh():
-    ip_server = '192.168.2.103'
+    ip_server = '192.168.2.104'
     user_server = 'lynx'
     client = paramiko.SSHClient()
     client.load_system_host_keys()
@@ -210,14 +210,14 @@ def swap_ip(request, container_name):
             client = create_client_ssh()
             try:
                 # print("TESTANDO-swap-2")
+                # Aqui vou ativar o signals do app nginx, assim ele vai remover o container que vai trocar de endereço
+                # ipv4 dos containers upstream
                 command = (f"lxc config device set {container_name} {interface} {ip_type}.address"
                            f" {ipaddress} && lxc restart {container_name}")
                 _, _, stderr = client.exec_command(command)
                 error = stderr.read().decode()
 
                 if not error:
-                    # Aqui eu poderia trocar o endereço ip no DB, no entanto, eu deixo para a atualização do daemon que
-                    # roda no servidor a ser monitorado, pois assim eu evito ficar sobrecarregando o servidor
                     return JsonResponse({'message': 'Endereço IPv4 trocado com sucesso!'})
                 else:
                     return JsonResponse({'error': f'Erro ao adicionar o IPv4: {error}'})
