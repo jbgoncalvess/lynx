@@ -5,7 +5,7 @@ import time
 import csv
 from io import StringIO
 
-url = 'http://192.168.2.105:8000/data_lxc_list/'
+url = 'http://192.168.77.1:8000/data_lxc_list/'
 
 # Função para contar o número de containers ativos
 def contar_containers_ativos():

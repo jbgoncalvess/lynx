@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.2.105:8000/metrics_containers/'
+url = 'http://192.168.77.1:8000/metrics_containers/'
 
 
 # Função para converter valores em MiB
@@ -96,12 +96,12 @@ def resolv_ip_name(requests_count):
 def metrics_log(log_file):
     last_timestamp = last_sec(log_file)
 
-    if last_timestamp is None:
-        print("Não foi possível obter o timestamp do log.")
-        return
-
     # Contador de requisições
     requests_count = {}
+
+    if last_timestamp is None:
+        print("Não foi possível obter o timestamp do log.")
+        return None
 
     # O último segundo
     target_timestamp = last_timestamp
@@ -133,8 +133,8 @@ def metrics_log(log_file):
                         'request_times': [request_time]
                     }
 
-    print(requests_count)
     requests_in_order = resolv_ip_name(requests_count)
+    print(f"RPS EM ORDEMN:")
     print(requests_in_order)
     return requests_in_order
 
@@ -165,20 +165,27 @@ def metrics_collect():
         # Dividir a saída do comando em linhas
         linhas = result.stdout.strip().split('\n')
         print(linhas)
-        print("arroz")
         # Me retorna o RPS para cada container, em ordem
         rps_urt_rt = metrics_log(log_file)
         print(f'TESTANDOOOOOOOOOOOO: {rps_urt_rt}')
-        rps = rps_urt_rt[0]
-        urt = rps_urt_rt[1]
-        rt = rps_urt_rt[2]
+        if rps_urt_rt == None:
+            # Se o arquivo de log está vazio (rotate aconteceu no momento ou ninguem ta acessando o servidor mesmo, eu adiciono 0 que indica que sem métricas de rps, urt rt)
+            rps = '0'
+            urt = '0'
+            rt = '0'
+            # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
+            for n in range(len(linhas)):
+                linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps + ',' + urt + ',' + rt
+        else:
+            rps = rps_urt_rt[0]
+            urt = rps_urt_rt[1]
+            rt = rps_urt_rt[2]
+            # Mesma inserção manual
+            for n in range(len(linhas)):
+                 linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n] + ',' + urt[n] + ',' + rt[n]
         print(rps)
         print(urt)
         print(rt)
-        # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
-        for n in range(len(linhas)):
-            linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n] + ',' + urt[n] + ',' + rt[n]
-
         print(linhas)
 
         for linha in linhas:
