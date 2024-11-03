@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data: {
             labels: data.container_names, // Exemplo de meses
             datasets: [{
-                label: 'Uso de Memória RAM (MB)',
+                label: 'Uso de Memória RAM',
                 data: data.ram_usages,  // Exemplo de dados
                 backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
                 borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
