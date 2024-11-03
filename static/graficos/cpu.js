@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     callbacks: {
                         label: function (context) {
-                            return '  ' + context.raw + 's';
+                            return '  ' + context.raw + '%';
                         }
                     },
                 },
@@ -56,12 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
             scales: {
                 y: {
                     beginAtZero: true,  // Começar o eixo Y no zero
+                    min: 0,
+                    max: 100,
                     grid: {
                         color: "rgba(14,14,14,0.8)",
                     },
                     ticks: {
                         color: "rgb(0,0,0)",
-                        stepSize: 1  // Exibir números inteiros no eixo Y
+                        stepSize: 25  // Exibir números inteiros no eixo Y
                     },
                 },
 

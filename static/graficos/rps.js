@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     ticks: {
                         color: "rgb(0,0,0)",
-                        stepSize: 1  // Exibir números inteiros no eixo Y
+                        stepSize: 10  // Exibir números inteiros no eixo Y
                     },
                 },
 

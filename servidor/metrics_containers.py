@@ -1,4 +1,4 @@
-# Neste código eu coleto as métricas que envolvem a máquina host do servidor e não os containers
+import os.path
 import requests
 import json
 import subprocess
@@ -7,34 +7,6 @@ from datetime import datetime
 
 # URL da API onde os dados serão enviados
 url = 'http://192.168.77.1:8000/metrics_containers/'
-
-
-# Função para converter valores em MiB
-def convert_to_mib(value):
-    try:
-        if 'GiB' in value:
-            return float(value.replace('GiB', '').strip()) * 1024  # Converte GiB para MiB
-        elif 'MiB' in value:
-            return float(value.replace('MiB', '').strip())  # Já está em MiB
-        elif 'KiB' in value:
-            return float(value.replace('KiB', '').strip()) / 1024
-    except ValueError:
-        print(f"Erro: Não foi possível converter '{value}' para MB.")
-        return 0
-
-
-# Função para converter horas para minutos - Possíveis valores example: '12:33' e '57 min'
-def convert_to_minutes(value):
-    try:
-        if ':' in value:
-            hour, minute = value.split(':')
-            return int(hour) * 60 + int(minute)
-        elif ' ' in value:
-            minute = value.split(' ')[0]
-            return int(minute)
-    except ValueError:
-        print(f"Erro: Não foi possível converter '{value}' para minutos.")
-        return 0
 
 
 # Função para pegar o último segundo de log, para coletar somente os logs referente aquele segundo
@@ -49,7 +21,7 @@ def last_sec(log_file):
             return datetime.strptime(result, '%d/%b/%Y:%H:%M:%S %z')
 
     except Exception as e:
-        print(f"Erro ao enviar a data atual do log: {e}")
+        print(f"Erro ao enviar a data atual do log.")
         return None
 
 
@@ -66,10 +38,6 @@ def resolv_ip_name(requests_count):
     urt = []
     rt = []
 
-    #requests_count['10.1.1.5'+':80']['upstream_response_times'][0] = 10.0
-    #requests_count['10.1.1.5'+':80']['upstream_response_times'][1] = 2.0
-    #requests_count['10.1.1.5'+':80']['upstream_response_times'].append(1.5)
-
     def average_aritmetica(sublist):
         if sublist:
             return sum(sublist) / len(sublist)
@@ -79,30 +47,26 @@ def resolv_ip_name(requests_count):
     for container_ip in container_ips:
         # Adiciona o valor de requests_count correspondente ou '0' se não encontrar o IP
         rps.append(str(requests_count.get(container_ip + ":80", {}).get('count', 0)))
-        urt.append(str(average_aritmetica(requests_count.get(container_ip + ":80", {}).get('upstream_response_times', 0))))
+        urt.append(
+            str(average_aritmetica(requests_count.get(container_ip + ":80", {}).get('upstream_response_times', 0))))
         rt.append(str(average_aritmetica(requests_count.get(container_ip + ":80", {}).get('request_times', 0))))
 
-
-    print("TESTANDO\n")
-    print(rps)
-    print(urt)
-    print(rt)
     data = [rps, urt, rt]
-    print(data)
     return data
 
 
 # Função para contar requisições por container no último segundo
 def metrics_log(log_file):
-    last_timestamp = last_sec(log_file)
+    # Verificar se existe o arquivo e ele não está vazio devido à rotina do rotate
+    if os.path.exists(log_file) and os.path.getsize(log_file) > 0:
+        last_timestamp = last_sec(log_file)
+
+    else:
+        print("Arquivo de log não existe ou não tem logs devido ao rotate.")
+        return None
 
     # Contador de requisições
     requests_count = {}
-
-    if last_timestamp is None:
-        print("Não foi possível obter o timestamp do log.")
-        return None
-
     # O último segundo
     target_timestamp = last_timestamp
 
@@ -134,22 +98,70 @@ def metrics_log(log_file):
                     }
 
     requests_in_order = resolv_ip_name(requests_count)
-    print(f"RPS EM ORDEMN:")
-    print(requests_in_order)
     return requests_in_order
 
 
-# Função para coletar o valor de uptime de cada container
-def get_uptime(container_name):
-    # Preciso do 'sed' pois o comando cut é bugado, ele retorna 2 espaçamentos quando é HORA ao invés de MIN
-    command = f"lxc exec {container_name} uptime | cut -d ',' -f 1 | cut -d ' ' -f 4,5 | sed 's/^ *//'"
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+# Função para coletar o uso de CPU de um container
+def get_cpu_usage(container_name):
+    try:
+        # Comando para coletar o uso de CPU somando o uso do usuário ($2), sistema ($4) e processos ajustados ($6)
+        command = f"lxc exec {container_name} -- top -bn1 | grep '%Cpu(s)' | awk '{{print $2 + $4 + $6}}'"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
-    if result.returncode == 0:
-        return result.stdout.strip()
-    else:
-        print(f"Erro ao obter uptime para {container_name}: {result.stderr}")
-        return 0
+        if result.returncode == 0:
+            result = result.stdout.strip()
+            return result.strip('%')
+        else:
+            print(f"Erro ao obter uso de CPU para {container_name}: {result.stderr}")
+            return None
+
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao executar o comando para uso de CPU: {e}")
+        return None
+
+
+# Função para coletar o uso do disco em um container
+def get_disk_usage(container_name):
+    try:
+        # Comando para coletar o uso de disco no sistema de arquivos root '/'
+        command = f"lxc exec {container_name} -- df -h / | awk 'NR==2 {{print $5}}'"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+        if result.returncode == 0:
+            result = result.stdout.strip()
+            return result.strip('%')
+        else:
+            print(f"Erro ao obter uso de disco para {container_name}: {result.stderr}")
+            return None
+
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao executar o comando para uso de disco: {e}")
+        return None
+
+
+# Função para coletar o uptime de um container
+def get_uptime(container_name):
+    try:
+        # Usei o 'awk' para extrair apenas o tempo de uptime
+        command = f"lxc exec {container_name} -- uptime | awk '{{print $3}}'"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+        if result.returncode == 0:
+            result = result.stdout.strip()
+            result = result.strip(',')
+            # Converter hora em minutos para padronizar os dados
+            if ':' in result:
+                hour, minute = result.split(':')
+                return str(int(hour) * 60 + int(minute))
+            else:
+                return result
+        else:
+            print(f"Erro ao obter uptime para {container_name}: {result.stderr}")
+            return None
+
+    except subprocess.CalledProcessError as e:
+        print(f"Erro ao executar o comando para uptime: {e}")
+        return None
 
 
 # Função para coletar as métricas de CPU e RAM de cada container ativo
@@ -158,49 +170,47 @@ def metrics_collect():
     containers_info = []  # Defino a lista aqui para garantir que exista
     rps_urt_rt = []
     try:
-        command = "lxc list --format csv --columns n,u,m,D,s,N | grep RUNNING | sed 's/,RUNNING//'"
+        # Name,
+        command = "lxc list --format csv --columns n,M,s,N | grep RUNNING | sed 's/,RUNNING//' | sed 's/%//g'"
         # Executa o comando para listar os containers ativos e suas métricas de CPU, RAM e disco
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
         # Dividir a saída do comando em linhas
         linhas = result.stdout.strip().split('\n')
-        print(linhas)
         # Me retorna o RPS para cada container, em ordem
         rps_urt_rt = metrics_log(log_file)
-        print(f'TESTANDOOOOOOOOOOOO: {rps_urt_rt}')
-        if rps_urt_rt == None:
-            # Se o arquivo de log está vazio (rotate aconteceu no momento ou ninguem ta acessando o servidor mesmo, eu adiciono 0 que indica que sem métricas de rps, urt rt)
+        if rps_urt_rt is None:
+            # Se o arquivo de log está vazio (rotate aconteceu no momento ou ninguém ta acessando o servidor mesmo,
+            # eu adiciono 0 que indica que sem métricas de rps, urt rt)
             rps = '0'
             urt = '0'
             rt = '0'
             # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
             for n in range(len(linhas)):
-                linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps + ',' + urt + ',' + rt
+                container_name = linhas[n].split(',')[0]
+                linhas[n] = (linhas[n] + ',' + get_cpu_usage(container_name) + ',' + get_disk_usage(container_name)
+                             + ',' + get_uptime(container_name) + ',' + rps + ',' + urt + ',' + rt)
         else:
             rps = rps_urt_rt[0]
             urt = rps_urt_rt[1]
             rt = rps_urt_rt[2]
             # Mesma inserção manual
             for n in range(len(linhas)):
-                 linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps[n] + ',' + urt[n] + ',' + rt[n]
-        print(rps)
-        print(urt)
-        print(rt)
-        print(linhas)
+                container_name = linhas[n].split(',')[0]
+                linhas[n] = (linhas[n] + ',' + get_cpu_usage(container_name) + ',' + get_disk_usage(container_name)
+                             + ',' + get_uptime(container_name) + ',' + rps[n] + ',' + urt[n] + ',' + rt[n])
 
         for linha in linhas:
             if linha:  # Ignorar linhas vazias
                 # Nome do container, uso de CPU e uso de memória separados por vírgula
-                container_name, cpu_usage, ram_usage, disk_usage, processes, uptime, rps, urt, rt = linha.split(',')
-
-                # Converter uso de CPU para float (removendo 's')
-                cpu_usage = float(cpu_usage.replace('s', '').strip())
+                container_name, ram_usage, processes, cpu_usage, disk_usage, uptime, rps, urt, rt = linha.split(',')
 
                 # Converter uso de RAM e disco para MiB e converter uptime para segundos
-                ram_usage = convert_to_mib(ram_usage)
-                disk_usage = convert_to_mib(disk_usage)
+                ram_usage = float(ram_usage)
                 processes = int(processes)
-                uptime = convert_to_minutes(uptime)
+                cpu_usage = float(cpu_usage)
+                disk_usage = float(disk_usage)
+                uptime = int(uptime)
                 rps = int(rps)
                 urt = float(urt)
                 rt = float(rt)
@@ -216,7 +226,6 @@ def metrics_collect():
                     'urt': urt,
                     'rt': rt
                 }
-                print(container_data)
                 containers_info.append(container_data)
 
     except Exception as e:
@@ -229,7 +238,20 @@ def metrics_collect():
 def send_metrics():
     # Coletar as métricas
     metrics_containers = metrics_collect()
-    # print(metrics_containers)
+
+    # Formatar os dados para debug, já que várias vezes eu enviei dados errados para o back
+    print("Dados dos Containers:")
+    for container in metrics_containers:
+        print(f"Container: {container['name']:<3}| "
+              f"CPU Usage: {container['cpu_usage']:<4}%| "
+              f"RAM Usage: {container['ram_usage']:<4}%| "
+              f"Disk Usage: {container['disk_usage']:<4}%| "
+              f"Uptime: {container['uptime']:<4}min| "
+              f"Processes: {container['processes']:<3}| "
+              f"RPS: {container['rps']:<2}rps| "
+              f"URT: {container['urt']:<4}s| "
+              f"RT: {container['rt']:<4}s")
+
     # Enviar os dados para o software
     headers = {'Content-Type': 'application/json'}
 
@@ -243,7 +265,6 @@ def send_metrics():
         print(f"Erro de conexão: {e}")
 
 
-# Loop infinito para enviar as métricas a cada 30 segundos
 while True:
     send_metrics()
-    time.sleep(15)  # Aguarda 15 segundos antes de executar novamente
+    time.sleep(15)
