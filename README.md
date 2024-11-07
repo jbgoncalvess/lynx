@@ -13,7 +13,6 @@ Bem-vindo ao Lynx, um software web de gerenciamento de servidores que permite a 
 
 O projeto é dividido em vários apps Django, cada um focado em uma funcionalidade específica:
 
-- **Home:** Página inicial com boas-vindas personalizadas e atualizações rápidas.
 - **Dashboard:** Visão geral dos recursos e status dos servidores.
 - **Containers:** Interface para gerenciar containers.
 - **Images:** Interface para gerenciar imagens de containers.
