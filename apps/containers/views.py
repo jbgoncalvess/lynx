@@ -1,5 +1,5 @@
 import json
-
+from django.db.models import Max
 import paramiko, time
 import re
 
@@ -18,8 +18,10 @@ def natural_key(container):
 @login_required
 def containers_view(request):
     ult_reg = CurrentCount.objects.order_by('-time').first()
+    print(ult_reg)
     # Ordena os containers pelo nome
-    containers = sorted(ContainerLxcList.objects.all(), key=natural_key)
+    containers = sorted(ContainerLxcList.objects.all().annotate(latest_time=Max('time')),
+                        key=natural_key)
 
     # Inicializa a lista que será passada para o modelo
     container_data = []

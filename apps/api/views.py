@@ -13,23 +13,20 @@ def data_lxc_list(request):
             # Converte o conteúdo da requisição JSON para dicionário
             data = json.loads(request.body)
 
-            # Extraio o número de containers ativos, insere no banco e compara com max e min
-            active_containers = data.get('active_containers', 0)
-            current_containers(active_containers)
-            max_min_containers(active_containers)
+            # Extrai os nomes dos containers recebidos
+            received_container_names = {container_data.get('name') for container_data in data}
 
-            # Extrai a lista de containers e seus detalhes
-            containers = data.get('containers', [])
-            print(containers)
+            # Remove containers do banco que não estão na nova lista recebida
+            ContainerLxcList.objects.exclude(container_name__in=received_container_names).delete()
 
-            # Processa cada container recebido
-            for container_data in containers:
+            # Processa cada container recebido para atualizar/criar registros no banco
+            for container_data in data:
                 container_name = container_data.get('name')
                 status = container_data.get('status', 'UNKNOWN')
                 ipv4_list = container_data.get('ipv4', [])
                 ipv6_list = container_data.get('ipv6', [])
 
-                # Verifica se o container já existe no banco de dados e cria/atualiza
+                # Cria ou atualiza o container com os novos dados
                 container, created = ContainerLxcList.objects.update_or_create(
                     container_name=container_name,
                     defaults={
@@ -38,29 +35,29 @@ def data_lxc_list(request):
                     }
                 )
 
-                # Remove os IPs antigos associados ao container se já existiam
+                # Remove IPs antigos associados ao container, se já existiam
                 if not created:
                     container.ips.all().delete()
 
-                # Adiciono endereços IPv4. Avança a cada 2, já que recebo os dados "IPV4, interface".
-                for i in range(0, len(ipv4_list), 2):  # A lista de ipv4 alterna entre IP e interface
+                # Adiciona endereços IPv4
+                for i in range(0, len(ipv4_list), 2):
                     ip_address = ipv4_list[i]
                     interface = re.sub(r'[()]', '', ipv4_list[i + 1])
                     ContainerIP.objects.create(
                         container=container,
                         ip_address=ip_address,
-                        interface=interface,  # Ajuste se a interface variar
+                        interface=interface,
                         ip_type='IPv4',
                     )
 
-                # Adiciono endereços IPV6. Avança a cada 2, já que recebo os dados "IPV6, interface".
-                for i in range(0, len(ipv6_list), 2):  # A lista de ipv6 alterna entre IP e interface
+                # Adiciona endereços IPv6
+                for i in range(0, len(ipv6_list), 2):
                     ip_address = ipv6_list[i]
-                    interface = re.sub(r'[()]', '', ipv6_list[i + 1])  # A interface está no índice seguinte
+                    interface = re.sub(r'[()]', '', ipv6_list[i + 1])
                     ContainerIP.objects.create(
                         container=container,
                         ip_address=ip_address,
-                        interface=interface,  # Ajuste se a interface variar
+                        interface=interface,
                         ip_type='IPv6',
                     )
 
@@ -72,6 +69,12 @@ def data_lxc_list(request):
             return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
     else:
         return JsonResponse({"error": "Método não permitido."}, status=405)
+
+
+@csrf_exempt
+def data_lxc_image(request):
+    print("EXECUTANDO")
+    return JsonResponse({"message": "Dados recebidos e salvos com sucesso."}, status=200)
 
 
 def current_containers(container_count):
@@ -124,9 +127,14 @@ def metrics_containers(request):
         try:
             # Lê o corpo da requisição
             data = json.loads(request.body)
+            containers_metrics = data.get('metrics_containers', [])
+            active_containers = data.get('active_containers', 0)
+            current_containers(active_containers)
+            max_min_containers(active_containers)
+
             container_names = []
             # Itera sobre as métricas de cada container
-            for container in data:
+            for container in containers_metrics:
                 # Exemplo: Criar ou atualizar um registro no banco de dados com base no nome do container
                 # Crio uma lista, pois os container que nao vir eu activate = false
                 container_names.append(container['name'])

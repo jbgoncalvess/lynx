@@ -39,9 +39,10 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                        <i class="fas fa-image me-2"></i>
-                        Imagens
+                    <a href="{% url 'images' %}" class="nav-link text-white bg-transparent border border-white rounded
+                       {% if request.resolver_match.url_name == 'images' %}active{% endif %}">
+                        <i class="fas fa-server me-2"></i>
+                        Images
                     </a>
                 </li>
                 <li>

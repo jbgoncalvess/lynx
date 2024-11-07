@@ -9,6 +9,18 @@ from datetime import datetime
 url = 'http://192.168.77.1:8000/metrics_containers/'
 
 
+def contar_containers_ativos():
+    try:
+        command = "lxc list --format csv --columns s | grep -c RUNNING"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        active_count = int(result.stdout.strip())
+        print(f"Número de containers ativos: {active_count}")
+        return active_count
+    except Exception as e:
+        print(f"Erro ao contar containers: {e}")
+        return 0
+
+
 # Função para pegar o último segundo de log, para coletar somente os logs referente aquele segundo
 def last_sec(log_file):
     try:
@@ -238,6 +250,12 @@ def metrics_collect():
 def send_metrics():
     # Coletar as métricas
     metrics_containers = metrics_collect()
+    active_containers = contar_containers_ativos()
+
+    data = {
+        'active_containers': active_containers,
+        'metrics_containers': metrics_containers
+    }
 
     # Formatar os dados para debug, já que várias vezes eu enviei dados errados para o back
     print("Dados dos Containers:")
@@ -256,7 +274,7 @@ def send_metrics():
     headers = {'Content-Type': 'application/json'}
 
     try:
-        response = requests.post(url, data=json.dumps(metrics_containers), headers=headers)
+        response = requests.post(url, data=json.dumps(data), headers=headers)
         if response.status_code == 200:
             print("Métricas enviadas com sucesso!")
         else:
