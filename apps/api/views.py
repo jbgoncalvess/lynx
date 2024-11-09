@@ -1,13 +1,15 @@
+from datetime import timedelta
+import locale
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP
+from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP, ContainerLxcImage
 from django.utils import timezone
 import json
 import re
 
 
 @csrf_exempt
-def data_lxc_list(request):
+def lxc_list(request):
     if request.method == 'POST':
         try:
             # Converte o conteúdo da requisição JSON para dicionário
@@ -72,9 +74,61 @@ def data_lxc_list(request):
 
 
 @csrf_exempt
-def data_lxc_image(request):
-    print("EXECUTANDO")
-    return JsonResponse({"message": "Dados recebidos e salvos com sucesso."}, status=200)
+def lxc_image(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            # Nomes das imagens recebidas
+            containers_images = {image.get('name') for image in data}
+
+            # Remove containers do banco que não estão na nova lista recebida
+            ContainerLxcImage.objects.exclude(image_name__in=containers_images).delete()
+
+            for image in data:
+                image_name = image.get('name')
+                description = image.get('description')
+                architecture = image.get('architecture')
+                size = image.get('size')
+                upload_date = image.get('upload_date')
+
+                # Aqui eu altero o Locale temporariamente, pois no padrão do meu projeto, ele está em PT_BR, e aqui eu
+                # preciso dele em inglês para converter a string para data (string formatada em ing de lxc_image_list)
+                locale.setlocale(locale.LC_TIME, 'C')
+
+                try:
+                    # Converte a data para datetime no locale em inglês
+                    upload_date = timezone.datetime.strptime(upload_date, "%b %d, %Y at %I:%M%p (UTC)")
+                    upload_date = timezone.make_aware(upload_date, timezone.get_current_timezone())
+
+                except ValueError:
+                    return JsonResponse({"error": f"Erro ao converter data: {upload_date}"}, status=400)
+                finally:
+                    # Após resolver isso, retorno o locale para português
+                    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+
+                # Agora que o locale original voltou, eu defino o horário como o do sistema
+                upload_date = upload_date - timedelta(hours=3)
+
+                # Salva no banco de dados
+                ContainerLxcImage.objects.update_or_create(
+                    image_name=image_name,
+                    defaults={
+                        'description': description,
+                        'architecture': architecture,
+                        'size': size,
+                        'upload_date': upload_date
+                    }
+                )
+
+            return JsonResponse({"message": "Dados recebidos e salvos com sucesso."}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "Método não permitido."}, status=405)
 
 
 def current_containers(container_count):

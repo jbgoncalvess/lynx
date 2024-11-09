@@ -50,7 +50,7 @@ class ContainerLxcList(models.Model):
     time = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=30)
 
-    def __str__(self):  # Dois underscores antes e depois
+    def __str__(self):
         return f"Container {self.container_name} - {self.time} - STATUS: {self.status}"
 
 
@@ -69,3 +69,16 @@ class ContainerIP(models.Model):
 
     def __str__(self):
         return f"IP {self.ip_address} ({self.ip_type}){self.interface} for container {self.container.container_name}"
+
+
+class ContainerLxcImage(models.Model):
+    image_name = models.CharField(max_length=100, unique=True)
+    time = models.DateTimeField(default=timezone.now)
+    description = models.CharField(max_length=150)
+    architecture = models.CharField(max_length=30)
+    size = models.CharField(max_length=30)
+    upload_date = models.DateTimeField()
+
+    def __str__(self):
+        return (f"Container {self.image_name} - {self.time} - Description: {self.description}"
+                f" - architecture: {self.architecture} - size: {self.size} - upload_date: {self.upload_date}")

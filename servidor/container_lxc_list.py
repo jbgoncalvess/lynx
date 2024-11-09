@@ -5,8 +5,8 @@ import time
 import csv
 from io import StringIO
 
-url_lxc_list = 'http://192.168.77.1:8000/data_lxc_list/'
-url_lxc_image = 'http://192.168.77.1:8000/data_lxc_image/'
+url_lxc_list = 'http://192.168.77.1:8000/lxc_list/'
+url_lxc_image = 'http://192.168.77.1:8000/lxc_image/'
 
 
 # Função para coletar os dados detalhados do LXC list
@@ -80,7 +80,7 @@ def enviar_dados():
     containers_lxc_image = collect_lxc_image()
 
     print(containers_lxc_list)
-    print("= * 100")
+    print('=' * 100)
     print(containers_lxc_image)
 
     # Cabeçalhos para indicar que estamos enviando JSON

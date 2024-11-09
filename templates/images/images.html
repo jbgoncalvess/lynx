@@ -11,12 +11,12 @@
     <link href="{% static 'bootstrap/mdb.min.css' %}" rel="stylesheet">
     <!-- CSS personalizado -->
     <link href="{% static 'base/base.css' %}" rel="stylesheet">
-    <!-- Gráficos chart -->
-    <script src="{% static 'bootstrap/chart.js' %}"></script>
+    <!-- CSS personalizado para loading-overview -->
+    <link href="{% static 'containers/loading_overlay.css' %}" rel="stylesheet">
 </head>
 
+
 {# Body #}
-<body>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white" style="width: 250px; height: 100vh;">
@@ -64,141 +64,66 @@
         </div>
     </aside>
 
-
-    <!-- Main content -->
+    {# Main #}
     <main class="content">
-        <div class="container-fluid">
-            <!-- Título do Dashboard -->
+        <div class="container-fluid"> <!-- Usando container-fluid para maior largura -->
             <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
-                <i class="fas fa-tachometer-alt me-1"></i> DASHBOARD
+                <i class="fas fa-box me-2"></i> IMAGES
             </h1>
+            <!-- Tabela de imagens -->
+            <div class="table-responsive border border-primary border-5 rounded mb-2">
+                <table class="table table-striped bg-light mb-1 align-middle text-center">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>Nome da Imagem</th>
+                            <th>Descrição</th>
+                            <th>Arquitetura</th>
+                            <th>Tamanho</th>
+                            <th>Data de Upload</th>
+                            <th>Remover</th>
+                            <th>Atualizar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for image in image_data %}
+                        <tr>
+                            <td>{{ image.image_name }}</td>
+                            <td>{{ image.description }}</td>
+                            <td>{{ image.architecture }}</td>
+                            <td>{{ image.size }}</td>
+                            <td>{{ image.upload_date|date:"d/m/Y H:i" }}</td>
 
-            <!-- Texto e Gráfico de Linhas -->
-            <i class="bg-primary text-black p-2 rounded text-center">Máximo e minímo de containers por dia</i>
-            <canvas class="w-100 border-5 rounded p-2 border-primary mb-2" id="max_min_day" height="280" style="border: solid;"></canvas>
-
-            <!-- Passar dados para o gráfico -->
-            <script id="mmd_data" type="application/json">
-                {
-                    "dates": {{ dates|safe }},
-                    "min_container_counts": {{ min_container_counts|safe }},
-                    "max_container_counts": {{ max_container_counts|safe }}
-                }
-            </script>
-
-            <script id="cpu_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "cpu_usages": {{ cpu_usages|safe }}
-                }
-            </script>
-
-            <script id="ram_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "ram_usages": {{ ram_usages|safe }}
-                }
-            </script>
-
-            <script id="disk_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "disk_usages": {{ disk_usages|safe }}
-                }
-            </script>
-
-            <script id="uptime_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "uptime": {{ uptime|safe }}
-                }
-            </script>
-
-            <script id="processes_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "processes": {{ processes|safe }}
-                }
-            </script>
-
-            <script id="rps_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "rps": {{ rps|safe }}
-                }
-            </script>
-
-            <script id="upstream_response_time_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "urt": {{ urt|safe }}
-                }
-            </script>
-
-            <script id="request_time_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "rt": {{ rt|safe }}
-                }
-            </script>
-            <!-- Layout com gráfico de barras alinhado à esquerda -->
-            <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
-            <div class="row">
-                <div class="col-md-6 mb-2">
-                    <canvas id="cpu" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="ram" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="disk" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="uptime" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="processes" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="upstream_response_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="request_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
+                            <!-- Botões de ação -->
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 remove-image-btn"
+                                        data-image-name="{{ image.image_name }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm px-3 update-image-btn"
+                                        data-image-name="{{ image.image_name }}">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-
-        <!-- Scripts -->
-        <script src="{% static 'graficos/max_min_day.js' %}"></script>
-        <script src="{% static 'graficos/cpu.js' %}"></script>
-        <script src="{% static 'graficos/ram.js' %}"></script>
-        <script src="{% static 'graficos/disk.js' %}"></script>
-        <script src="{% static 'graficos/uptime.js' %}"></script>
-        <script src="{% static 'graficos/processes.js' %}"></script>
-        <script src="{% static 'graficos/rps.js' %}"></script>
-        <script src="{% static 'graficos/upstream_response_time.js' %}"></script>
-        <script src="{% static 'graficos/request_time.js' %}"></script>
-
     </main>
 
-    <!-- MDB JS -->
+
+    <!-- MDBootstrap -->
     <script src="{% static 'bootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
 
+
     {# Footer #}
     <footer class="footer bg-dark text-white">
-        <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
+      <p>&copy; Todos os direitos reservados. Desenvolvido por <a href="https://github.com/jbgoncalvess">Jardel Gonçalves.</a></p>
     </footer>
-</body>
+
 </html>
