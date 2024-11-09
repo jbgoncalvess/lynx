@@ -4,7 +4,6 @@ import re
 import paramiko
 import time
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -191,6 +190,7 @@ def restart_container(request, container_name):
         return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
 
 
+@login_required
 @csrf_exempt
 def swap_ip(request, container_name):
     try:
@@ -228,6 +228,7 @@ def swap_ip(request, container_name):
         return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
 
 
+@login_required
 @csrf_exempt
 def toggle_ipv6(request, container_name):
     try:

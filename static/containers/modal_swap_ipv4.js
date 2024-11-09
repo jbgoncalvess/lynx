@@ -80,7 +80,7 @@ function addIpAddress(containerName) {
         console.error('Erro:', error);
         alert('Ocorreu um erro ao processar a solicitação.');
     })
-    .finally(hideLoadingOverlay);
+    .finally(() => hideLoadingOverlay());
 }
 
 // Configura os botões para abrir o modal com as interfaces corretas

@@ -1,10 +1,13 @@
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from apps.api.models import ContainerLxcImage
-from django.utils import timezone
+from apps.containers.views import create_client_ssh
 
 
+@login_required
 def images_view(request):
-    # Obtém todas as imagens salvas no banco de dados
     images = ContainerLxcImage.objects.all()
 
     # Inicializa a lista de dados das imagens
@@ -12,8 +15,6 @@ def images_view(request):
 
     # Itera sobre as imagens para coletar os dados
     for image in images:
-        # Converte a data de upload para o fuso horário local
-
         # Adiciona os dados da imagem à lista
         image_data.append({
             'image_name': image.image_name,
@@ -24,7 +25,47 @@ def images_view(request):
         })
         print(image.upload_date)
 
-    # Envia os dados como contexto para o template
+    # Envia os dados como contexto para o modelo, para exibição
     return render(request, 'images/images.html', {
         'image_data': image_data,
     })
+
+
+@login_required
+@csrf_exempt
+def delete_image(request, image_name):
+    if request.method == 'POST':
+        try:
+            client = create_client_ssh()
+            try:
+                command = f"lxc image delete {image_name}"
+                _, _, stderr = client.exec_command(command)
+
+                # Verifica se houve erro no comando
+                error = stderr.read().decode()
+                if error:
+                    print(f"Erro ao excluir imagem no servidor: {error}")
+                    return JsonResponse({"success": False, "message": "Erro ao excluir a imagem no servidor."},
+                                        status=500)
+
+                # Se não houve erro, exclui a imagem do banco de dados, pois eu removi ela
+                ContainerLxcImage.objects.filter(image_name=image_name).delete()
+                return JsonResponse({"success": True, "message": "Imagem excluída com sucesso."},
+                                    status=200)
+
+            except Exception as ssh_error:
+                print(f"Erro SSH: {ssh_error}")
+                return JsonResponse({"success": False, "message": "Erro ao conectar ao servidor via SSH."},
+                                    status=500)
+
+            finally:
+                client.close()
+
+        except Exception as e:
+            print(f"Erro ao processar a requisição: {e}")
+            return JsonResponse({"success": False, "message": "Erro interno ao processar a solicitação."},
+                                status=500)
+
+    # Método não sendo delete, dá erro!
+    return JsonResponse({"success": False, "message": "Método não permitido."},
+                        status=405)

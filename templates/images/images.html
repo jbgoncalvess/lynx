@@ -75,12 +75,12 @@
                 <table class="table table-striped bg-light mb-1 align-middle text-center">
                     <thead class="bg-primary text-white">
                         <tr>
-                            <th>Nome da Imagem</th>
+                            <th>Nome</th>
                             <th>Descrição</th>
                             <th>Arquitetura</th>
                             <th>Tamanho</th>
                             <th>Data de Upload</th>
-                            <th>Remover</th>
+                            <th>Excluir</th>
                             <th>Atualizar</th>
                         </tr>
                     </thead>
@@ -96,7 +96,7 @@
                             <!-- Botões de ação -->
                             <td>
                                 <button type="button" class="btn btn-link btn-sm px-3 remove-image-btn"
-                                        data-image-name="{{ image.image_name }}">
+                                        onclick="showDeleteConfirmation('{{ image.image_name }}')">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -112,6 +112,35 @@
                 </table>
             </div>
         </div>
+
+
+        <!-- Overlay de Carregamento usando MDBootstrap Spinner -->
+        <div id="loading-overlay">
+            <div class="spinner-grow text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação de Exclusão -->
+        <div class="modal fade" id="modalDeleteConfirmation" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalDeleteLabel">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza de que deseja excluir a imagem "<span id="imageToDelete"></span>"?</p>
+                        <p class="text-muted">Essa ação não poderá ser desfeita.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-rounded btn-warning" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-rounded btn-primary" id="confirmDeleteButton">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
 
@@ -119,6 +148,8 @@
     <script src="{% static 'bootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
+    <!-- Excluir image -->
+    <script src="{% static 'images/delete_image.js' %}"></script>
 
 
     {# Footer #}

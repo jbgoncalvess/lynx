@@ -59,7 +59,5 @@ document.getElementById('saveIpv6ToggleAction').addEventListener('click', functi
         console.error('Erro:', error);
         alert('Ocorreu um erro ao processar a solicitação.');
     })
-    .finally(() => {
-        hideLoadingOverlay(); // Esconde o overlay de carregamento
-    });
+    .finally(() => hideLoadingOverlay());
 });
