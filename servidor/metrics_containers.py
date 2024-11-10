@@ -271,7 +271,10 @@ def send_metrics():
               f"RT: {container['rt']:<4}s")
 
     # Enviar os dados para o software
-    headers = {'Content-Type': 'application/json'}
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Token f8a024c16665a99d561940c16712ea349351c3a6302650f2b3175b98282c30e9'
+    }
 
     try:
         response = requests.post(url, data=json.dumps(data), headers=headers)

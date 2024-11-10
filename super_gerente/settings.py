@@ -31,6 +31,8 @@ DEBUG = True
 # deve enviar dados pro software
 ALLOWED_HOSTS = ['*']
 
+AUTH_TOKEN = 'f8a024c16665a99d561940c16712ea349351c3a6302650f2b3175b98282c30e9'
+
 # Application definition
 
 INSTALLED_APPS = [

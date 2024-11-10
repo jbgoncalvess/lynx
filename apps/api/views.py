@@ -6,11 +6,56 @@ from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcLis
 from django.utils import timezone
 import json
 import re
+from django.conf import settings
 
 
+def current_containers(container_count):
+    # Adiciona um novo registro na tabela ContainerStatus (time é adiciona o atual do Br)
+    CurrentCount.objects.create(container_count=container_count)
+    # Manter apenas os últimos 3 registros de containers ativos para não acumular lixo
+    if CurrentCount.objects.count() > 3:
+        oldest_entry = CurrentCount.objects.order_by('time').first()
+        oldest_entry.delete()
+
+
+def max_min_containers(container_count):
+    # Adicionar a data atual, pegando somente o ANO/MES/DIA
+    current_date = timezone.localtime().date()
+    # Verifico se tem algum registro nesse dia
+    existing_entry = DailyMaxMin.objects.filter(date=current_date).first()
+
+    # Se tiver registro, eu verifico se é o maior ou o menor do dia, só pode ser os dois se a tabela não existir
+    # para aquele dia
+    if existing_entry:
+        if existing_entry.max_containers < container_count:
+            existing_entry.max_containers = container_count
+            existing_entry.save()
+
+        elif existing_entry.min_containers > container_count:
+            existing_entry.min_containers = container_count
+            existing_entry.save()
+
+    # Se não tiver registro, eu crio um novo com o valor que chegou, tanto para Min quanto para Max
+    else:
+        DailyMaxMin.objects.create(
+            date=current_date,
+            max_containers=container_count,
+            min_containers=container_count,
+        )
+
+    # Mantém no máximo 90 dias de registros
+    if DailyMaxMin.objects.count() > 90:
+        oldest_entry = DailyMaxMin.objects.order_by('date').first()
+        oldest_entry.delete()
+
+
+#######################################################################################################################
 @csrf_exempt
 def lxc_list(request):
     if request.method == 'POST':
+        client_auth = request.headers.get('Authorization')
+        if client_auth != f'Token {settings.AUTH_TOKEN}':
+            return JsonResponse({"error": "Não autorizado"}, status=401)
         try:
             # Converte o conteúdo da requisição JSON para dicionário
             data = json.loads(request.body)
@@ -71,11 +116,16 @@ def lxc_list(request):
             return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
     else:
         return JsonResponse({"error": "Método não permitido."}, status=405)
+#######################################################################################################################
 
 
+#######################################################################################################################
 @csrf_exempt
 def lxc_image(request):
     if request.method == 'POST':
+        client_auth = request.headers.get('Authorization')
+        if client_auth != f'Token {settings.AUTH_TOKEN}':
+            return JsonResponse({"error": "Não autorizado"}, status=401)
         try:
             data = json.loads(request.body)
 
@@ -129,55 +179,16 @@ def lxc_image(request):
             return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Método não permitido."}, status=405)
-
-
-def current_containers(container_count):
-    # Adiciona um novo registro na tabela ContainerStatus (time é adiciona o atual do Br)
-    CurrentCount.objects.create(container_count=container_count)
-    # Manter apenas os últimos 3 registros de containers ativos para não acumular lixo
-    if CurrentCount.objects.count() > 3:
-        oldest_entry = CurrentCount.objects.order_by('time').first()
-        oldest_entry.delete()
-
-
-def max_min_containers(container_count):
-    # Adicionar a data atual, pegando somente o ANO/MES/DIA
-    current_date = timezone.localtime().date()
-    # Verifico se tem algum registro nesse dia
-    existing_entry = DailyMaxMin.objects.filter(date=current_date).first()
-
-    # Se tiver registro, eu verifico se é o maior ou o menor do dia, só pode ser os dois se a tabela não existir
-    # para aquele dia
-    if existing_entry:
-        if existing_entry.max_containers < container_count:
-            existing_entry.max_containers = container_count
-            existing_entry.save()
-
-        elif existing_entry.min_containers > container_count:
-            existing_entry.min_containers = container_count
-            existing_entry.save()
-
-    # Se não tiver registro, eu crio um novo com o valor que chegou, tanto para Min quanto para Max
-    else:
-        DailyMaxMin.objects.create(
-            date=current_date,
-            max_containers=container_count,
-            min_containers=container_count,
-        )
-
-    # Mantém no máximo 90 dias de registros
-    if DailyMaxMin.objects.count() > 90:
-        oldest_entry = DailyMaxMin.objects.order_by('date').first()
-        oldest_entry.delete()
-
-
-#######################################################################################################################
 #######################################################################################################################
 
 
+#######################################################################################################################
 @csrf_exempt
 def metrics_containers(request):
     if request.method == 'POST':
+        client_auth = request.headers.get('Authorization')
+        if client_auth != f'Token {settings.AUTH_TOKEN}':
+            return JsonResponse({"error": "Não autorizado"}, status=401)
         try:
             # Lê o corpo da requisição
             data = json.loads(request.body)
@@ -242,6 +253,4 @@ def metrics_containers(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método não permitido'}, status=405)
-
-#######################################################################################################################
 #######################################################################################################################

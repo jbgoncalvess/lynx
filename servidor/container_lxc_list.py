@@ -84,7 +84,10 @@ def enviar_dados():
     print(containers_lxc_image)
 
     # Cabeçalhos para indicar que estamos enviando JSON
-    headers = {'Content-Type': 'application/json'}
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Token f8a024c16665a99d561940c16712ea349351c3a6302650f2b3175b98282c30e9'
+    }
 
     # Envia os dados de containers_lxc_list para o Lynx
     try:
