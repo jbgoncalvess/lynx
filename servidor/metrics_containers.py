@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.77.1:8000/metrics_containers/'
+url = 'http://192.168.77.1:8000/api/metrics_containers/'
 
 
 def contar_containers_ativos():

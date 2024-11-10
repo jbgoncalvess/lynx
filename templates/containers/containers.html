@@ -230,11 +230,11 @@
     <!-- Passando o token CSRF para o JavaScript, com uma variável global, pois eu separo os arquivos js do html-->
     <script type="text/javascript"> window.CSRF_TOKEN = '{{ csrf_token }}';</script>
     <!-- Requisição AJAX para o back-end, interagir com os botões "start", "stop" e "restart" -->
-    <script src="{% static 'containers/Ajax.js' %}"></script>
+    <script src="{% static 'containers/start_stop_restart.js' %}"></script>
     <!-- Modal para trocar endereços IPv4 dos containers -->
-    <script src="{% static '/containers/modal_swap_ipv4.js' %}"></script>
+    <script src="{% static '/containers/swap_ipv4.js' %}"></script>
     <!-- Modal para habilitar ou não IPv6 -->
-    <script src="{% static '/containers/modal_toggle_ipv6.js' %}"></script>
+    <script src="{% static '/containers/toggle_ipv6.js' %}"></script>
 
     {# Footer #}
     <footer class="footer bg-dark text-white">

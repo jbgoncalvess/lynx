@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Se qualquer botão for ativado, eu ja exibo a tela de carregamento
                 showLoadingOverlay();
-                fetch(`/${urlBase}/${containerName}/`, {
+                fetch(`/containers/${urlBase}/${containerName}/`, {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',

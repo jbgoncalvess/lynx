@@ -38,8 +38,8 @@ document.getElementById('saveIpv6ToggleAction').addEventListener('click', functi
 
     showLoadingOverlay(); // Mostra o overlay de carregamento
 
-    fetch(`/toggle-ipv6/${currentContainerName}/`, {
-        method: 'POST',
+    fetch(`/containers/toggle-ipv6/${currentContainerName}/`, {
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',

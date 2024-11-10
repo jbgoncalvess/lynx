@@ -60,8 +60,8 @@ function addIpAddress(containerName) {
 
     showLoadingOverlay();
 
-    fetch(`/swap-ipv4/${containerName}/`, {
-        method: 'POST',
+    fetch(`/containers/swap-ipv4/${containerName}/`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',

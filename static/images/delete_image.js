@@ -25,8 +25,8 @@ function showDeleteConfirmation(imageName) {
 // Função para enviar a solicitação de exclusão ao back-end
 function deleteImage(imageName) {
     showLoadingOverlay();
-    fetch(`/delete-image/${imageName}/`, {
-        method: 'POST',
+    fetch(`/images/delete-image/${imageName}/`, {
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': window.CSRF_TOKEN
