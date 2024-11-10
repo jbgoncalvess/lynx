@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from apps.api.models import ContainerLxcImage
 from apps.containers.views import create_client_ssh
 
@@ -32,7 +31,6 @@ def images_view(request):
 
 
 @login_required
-@csrf_exempt
 def delete_image(request, image_name):
     if request.method == 'POST':
         try:

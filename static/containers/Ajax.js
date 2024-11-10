@@ -20,9 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Se qualquer botão for ativado, eu ja exibo a tela de carregamento
                 showLoadingOverlay();
                 fetch(`/${urlBase}/${containerName}/`, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': window.CSRF_TOKEN
                     }
                 })
                 .then(response => response.json())

@@ -29,6 +29,7 @@ function deleteImage(imageName) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': window.CSRF_TOKEN
         }
     })
     .then(response => response.json())

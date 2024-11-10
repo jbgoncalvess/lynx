@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lynx</title>
@@ -43,12 +44,6 @@
                        {% if request.resolver_match.url_name == 'images' %}active{% endif %}">
                         <i class="fas fa-server me-2"></i>
                         Images
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                        <i class="fas fa-server me-2"></i>
-                        Balanceamento
                     </a>
                 </li>
             </ul>
@@ -232,6 +227,8 @@
     <script src="{% static 'bootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
+    <!-- Passando o token CSRF para o JavaScript, com uma variável global, pois eu separo os arquivos js do html-->
+    <script type="text/javascript"> window.CSRF_TOKEN = '{{ csrf_token }}';</script>
     <!-- Requisição AJAX para o back-end, interagir com os botões "start", "stop" e "restart" -->
     <script src="{% static 'containers/Ajax.js' %}"></script>
     <!-- Modal para trocar endereços IPv4 dos containers -->

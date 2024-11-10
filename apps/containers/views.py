@@ -1,13 +1,10 @@
 import json
 import re
-
 import paramiko
 import time
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-
 from apps.api.models import ContainerLxcList, CurrentCount
 
 
@@ -61,142 +58,153 @@ def create_client_ssh():
 
 @login_required
 def start_container(request, container_name):
-    try:
-        container = ContainerLxcList.objects.get(container_name=container_name)
-        if container.status != 'RUNNING':
-            # Função para criar o cliente SSH
-            client = create_client_ssh()
-            try:
-                command = f"lxc start {container_name}"
-                _, _, stderr = client.exec_command(command)
-                error = stderr.read().decode()
+    if request.method == 'POST':
+        try:
+            container = ContainerLxcList.objects.get(container_name=container_name)
+            if container.status != 'RUNNING':
+                # Função para criar o cliente SSH
+                client = create_client_ssh()
+                try:
+                    command = f"lxc start {container_name}"
+                    _, _, stderr = client.exec_command(command)
+                    error = stderr.read().decode()
 
-                if error:
-                    print(f"Error: {error}")
+                    if error:
+                        print(f"Error: {error}")
 
-                # Somente atualiza o status se não houver erros
-                if not error:
-                    container.status = 'RUNNING'
-                    container.save()
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': f'Container {container_name} iniciado com sucesso!'
-                    })
-                else:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': f'Erro ao iniciar o container: {error}'
-                    })
-            finally:
-                # Fechar a conexão SSH
-                client.close()
-        else:
-            return JsonResponse({
-                'status': 'info',
-                'message': f'Container {container_name} já está em execução!'
-            })
+                    # Somente atualiza o status se não houver erros
+                    if not error:
+                        container.status = 'RUNNING'
+                        container.save()
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': f'Container {container_name} iniciado com sucesso!'
+                        })
+                    else:
+                        return JsonResponse({
+                            'status': 'error',
+                            'message': f'Erro ao iniciar o container: {error}'
+                        })
+                finally:
+                    # Fechar a conexão SSH
+                    client.close()
+            else:
+                return JsonResponse({
+                    'status': 'info',
+                    'message': f'Container {container_name} já está em execução!'
+                })
 
-    except paramiko.SSHException as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
+        except paramiko.SSHException as e:
+            return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+
+    else:
+        return JsonResponse({"success": False, "message": "Método não permitido."},
+                            status=405)
 
 
 @login_required
 def stop_container(request, container_name):
-    try:
-        container = ContainerLxcList.objects.get(container_name=container_name)
-        if container.status == 'RUNNING':
-            # Função para criar o cliente SSH
-            client = create_client_ssh()
-            try:
-                command = f"lxc stop {container_name}"
-                _, _, stderr = client.exec_command(command)
+    if request.method == 'POST':
+        try:
+            container = ContainerLxcList.objects.get(container_name=container_name)
+            if container.status == 'RUNNING':
+                # Função para criar o cliente SSH
+                client = create_client_ssh()
+                try:
+                    command = f"lxc stop {container_name}"
+                    _, _, stderr = client.exec_command(command)
 
-                error = stderr.read().decode()
+                    error = stderr.read().decode()
 
-                if error:
-                    print(f"Error: {error}")
+                    if error:
+                        print(f"Error: {error}")
 
-                if not error:
-                    container.status = 'STOPPED'
-                    container.save()
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': f'Container {container_name} parado com sucesso!'
-                    })
-                else:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': f'Erro ao parar o container: {error}'
-                    })
-            finally:
-                # Fechar a conexão SSH
-                client.close()
-        else:
-            return JsonResponse({
-                'status': 'info',
-                'message': f'Container {container_name} já está parado!'
-            })
+                    if not error:
+                        container.status = 'STOPPED'
+                        container.save()
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': f'Container {container_name} parado com sucesso!'
+                        })
+                    else:
+                        return JsonResponse({
+                            'status': 'error',
+                            'message': f'Erro ao parar o container: {error}'
+                        })
+                finally:
+                    # Fechar a conexão SSH
+                    client.close()
+            else:
+                return JsonResponse({
+                    'status': 'info',
+                    'message': f'Container {container_name} já está parado!'
+                })
 
-    except paramiko.SSHException as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
+        except paramiko.SSHException as e:
+            return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+    else:
+        return JsonResponse({"success": False, "message": "Método não permitido."},
+                            status=405)
 
 
 @login_required
 def restart_container(request, container_name):
-    try:
-        container = ContainerLxcList.objects.get(container_name=container_name)
-        if container.status == 'RUNNING':
-            # Função para criar o cliente SSH
-            client = create_client_ssh()
-            try:
-                command = f"lxc restart {container_name}"
-                stdin, stdout, stderr = client.exec_command(command)
-                error = stderr.read().decode()
+    if request.method == 'POST':
+        try:
+            container = ContainerLxcList.objects.get(container_name=container_name)
+            if container.status == 'RUNNING':
+                # Função para criar o cliente SSH
+                client = create_client_ssh()
+                try:
+                    command = f"lxc restart {container_name}"
+                    stdin, stdout, stderr = client.exec_command(command)
+                    error = stderr.read().decode()
 
-                if error:
-                    print(f"Error: {error}")
+                    if error:
+                        print(f"Error: {error}")
 
-                # Somente atualiza o status se não houver erros
-                if not error:
-                    # Não atualizo o container.status, pois se reiniciou correto ele esta rodando
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': f'Container {container_name} reiniciado com sucesso!'
-                    })
-                else:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': f'Erro ao reiniciar o container: {error}'
-                    })
-            finally:
-                # Fechar a conexão SSH
-                client.close()
-        else:
-            return JsonResponse({
-                'status': 'info',
-                'message': f'Container {container_name} está parado, por isso não é possível reiniciá-lo!'
-            })
+                    # Somente atualiza o status se não houver erros
+                    if not error:
+                        # Não atualizo o container.status, pois se reiniciou correto ele esta rodando
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': f'Container {container_name} reiniciado com sucesso!'
+                        })
+                    else:
+                        return JsonResponse({
+                            'status': 'error',
+                            'message': f'Erro ao reiniciar o container: {error}'
+                        })
+                finally:
+                    # Fechar a conexão SSH
+                    client.close()
+            else:
+                return JsonResponse({
+                    'status': 'info',
+                    'message': f'Container {container_name} está parado, por isso não é possível reiniciá-lo!'
+                })
 
-    except paramiko.SSHException as e:
-        return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
+        except paramiko.SSHException as e:
+            return JsonResponse({'status': 'error', 'message': f'Erro de SSH: {str(e)}'})
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro inesperado: {str(e)}'})
+    else:
+        return JsonResponse({"success": False, "message": "Método não permitido."},
+                            status=405)
 
 
 @login_required
-@csrf_exempt
 def swap_ip(request, container_name):
-    try:
-        if request.method == 'POST':
+    if request.method == 'POST':
+        try:
             data = json.loads(request.body)
-            print("TESTANDO-swap")
             interface = data.get('interface')
             ipaddress = data.get('ip_address')
 
@@ -220,19 +228,19 @@ def swap_ip(request, container_name):
             finally:
                 client.close()
 
-        else:
-            return JsonResponse({"error": "Método não permitido."}, status=405)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+
+    else:
+        return JsonResponse({"error": "Método não permitido."}, status=405)
 
 
 @login_required
-@csrf_exempt
 def toggle_ipv6(request, container_name):
-    try:
-        if request.method == 'POST':
+    if request.method == 'POST':
+        try:
             data = json.loads(request.body)
             action_ipv6 = data.get('action')  # 'enable' ou 'disable'
 
@@ -283,9 +291,9 @@ def toggle_ipv6(request, container_name):
             finally:
                 client.close()
 
-        else:
-            return JsonResponse({"error": "Método não permitido."}, status=405)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao decodificar o JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
+    else:
+        return JsonResponse({"error": "Método não permitido."}, status=405)

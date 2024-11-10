@@ -43,6 +43,7 @@ document.getElementById('saveIpv6ToggleAction').addEventListener('click', functi
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': window.CSRF_TOKEN
         },
         body: JSON.stringify({
             action: ipv6Action

@@ -65,6 +65,7 @@ function addIpAddress(containerName) {
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': window.CSRF_TOKEN
         },
         body: JSON.stringify({
             interface: selectedInterface,

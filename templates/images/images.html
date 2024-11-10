@@ -45,12 +45,6 @@
                         Images
                     </a>
                 </li>
-                <li>
-                    <a href="#" class="nav-link text-white bg-transparent border border-white rounded">
-                        <i class="fas fa-server me-2"></i>
-                        Balanceamento
-                    </a>
-                </li>
             </ul>
             <div class="dropdown mt-auto">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-mdb-toggle="dropdown" aria-expanded="false">
@@ -81,7 +75,6 @@
                             <th>Tamanho</th>
                             <th>Data de Upload</th>
                             <th>Excluir</th>
-                            <th>Atualizar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,12 +91,6 @@
                                 <button type="button" class="btn btn-link btn-sm px-3 remove-image-btn"
                                         onclick="showDeleteConfirmation('{{ image.image_name }}')">
                                     <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-link btn-sm px-3 update-image-btn"
-                                        data-image-name="{{ image.image_name }}">
-                                    <i class="fas fa-sync-alt"></i>
                                 </button>
                             </td>
                         </tr>
@@ -148,6 +135,8 @@
     <script src="{% static 'bootstrap/mdb.min.js' %}"></script>
     <!-- FontAwesome (para os ícones) -->
     <script src="{% static 'bootstrap/fontawesome.js' %}"></script>
+    <!-- Passando o token CSRF para o JavaScript, com uma variável global, pois eu separo os arquivos js do html-->
+    <script type="text/javascript"> window.CSRF_TOKEN = '{{ csrf_token }}';</script>
     <!-- Excluir image -->
     <script src="{% static 'images/delete_image.js' %}"></script>
 
