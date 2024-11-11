@@ -61,10 +61,10 @@ def lxc_list(request):
             data = json.loads(request.body)
 
             # Extrai os nomes dos containers recebidos
-            received_container_names = {container_data.get('name') for container_data in data}
+            container_names = {container_data.get('name') for container_data in data}
 
             # Remove containers do banco que não estão na nova lista recebida
-            ContainerLxcList.objects.exclude(container_name__in=received_container_names).delete()
+            ContainerLxcList.objects.exclude(container_name__in=container_names).delete()
 
             # Processa cada container recebido para atualizar/criar registros no banco
             for container_data in data:
@@ -190,10 +190,13 @@ def metrics_containers(request):
         if client_auth != f'Token {settings.AUTH_TOKEN}':
             return JsonResponse({"error": "Não autorizado"}, status=401)
         try:
-            # Lê o corpo da requisição
             data = json.loads(request.body)
             containers_metrics = data.get('metrics_containers', [])
             active_containers = data.get('active_containers', 0)
+
+            container_names = {container_data.get('name') for container_data in containers_metrics}
+            ContainerMetrics.objects.exclude(container_name__in=container_names).delete()
+
             current_containers(active_containers)
             max_min_containers(active_containers)
 
