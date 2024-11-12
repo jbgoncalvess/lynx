@@ -2,7 +2,7 @@ from datetime import timedelta
 import locale
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import HostCurrentCount, HostDailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP, ContainerLxcImage
+from .models import HostContainersConnections, HostRps, HostDailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP, ContainerLxcImage
 from django.utils import timezone
 import json
 import re
@@ -11,41 +11,10 @@ from django.conf import settings
 
 def host_metrics(active_containers, active_connections, rps):
     # Adiciona um novo registro na tabela ContainerStatus (time é adiciona o atual do Br)
-    HostCurrentCount.objects.create(container_count=active_containers, active_connections=active_connections, rps=rps)
+    HostContainersConnections.objects.create(container_count=active_containers, active_connections=active_connections, rps=rps)
     # Manter apenas os últimos 3 registros de containers ativos para não acumular lixo
-    if HostCurrentCount.objects.count() > 3:
-        oldest_entry = HostCurrentCount.objects.order_by('time').first()
-        oldest_entry.delete()
-
-
-def max_min_containers(container_count):
-    # Adicionar a data atual, pegando somente o ANO/MES/DIA
-    current_date = timezone.localtime().date()
-    # Verifico se tem algum registro nesse dia
-    existing_entry = HostDailyMaxMin.objects.filter(date=current_date).first()
-
-    # Se tiver registro, eu verifico se é o maior ou o menor do dia, só pode ser os dois se a tabela não existir
-    # para aquele dia
-    if existing_entry:
-        if existing_entry.max_containers < container_count:
-            existing_entry.max_containers = container_count
-            existing_entry.save()
-
-        elif existing_entry.min_containers > container_count:
-            existing_entry.min_containers = container_count
-            existing_entry.save()
-
-    # Se não tiver registro, eu crio um novo com o valor que chegou, tanto para Min quanto para Max
-    else:
-        HostDailyMaxMin.objects.create(
-            date=current_date,
-            max_containers=container_count,
-            min_containers=container_count,
-        )
-
-    # Mantém no máximo 90 dias de registros
-    if HostDailyMaxMin.objects.count() > 90:
-        oldest_entry = HostDailyMaxMin.objects.order_by('date').first()
+    if HostContainersConnections.objects.count() > 3:
+        oldest_entry = HostContainersConnections.objects.order_by('time').first()
         oldest_entry.delete()
 
 
@@ -204,12 +173,16 @@ def metrics(request):
             ContainerMetrics.objects.exclude(container_name__in=container_names).delete()
 
             # Número de containers ativos, conexões ativas no servidor e requisições feitas por segundo
-            host, created = HostCurrentCount.objects.get_or_create(id=1)
-            host.active_containers = active_containers
-            host.active_connections = active_connections
-            host.add_request(request)
+            # Cria uma nova instância de HostContainersConnections
+            HostContainersConnections.objects.create(
+                active_containers=active_containers,
+                active_connections=active_connections
+            )
 
-            max_min_containers(active_containers)
+            HostRps.objects.create(requests=request)
+
+            max_min = HostDailyMaxMin(max_containers=active_containers,min_containers=active_containers)
+            max_min.update_or_create_record()
 
             container_names = []
             # Itera sobre as métricas de cada container
@@ -252,11 +225,14 @@ def metrics(request):
                         requests_c=[request_c]
                     )
 
-            host = HostCurrentCount.objects.all()
+            host = HostContainersConnections.objects.all()
             print(host)
 
             container = ContainerMetrics.objects.all()
             print(container)
+
+            rps = HostRps.objects.all()
+            print(rps)
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
              .update(active=False))

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.shortcuts import render
-from apps.api.models import ContainerLxcList, HostCurrentCount
+from apps.api.models import ContainerLxcList, HostContainersConnections
 
 
 def natural_key(container):
@@ -15,7 +15,7 @@ def natural_key(container):
 
 @login_required
 def containers_view(request):
-    ult_reg = HostCurrentCount.objects.order_by('-time').first()
+    ult_reg = HostContainersConnections.objects.order_by('-time').first()
     print(ult_reg)
     # Ordena os containers pelo nome
     containers = sorted(ContainerLxcList.objects.all(), key=natural_key)

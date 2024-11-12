@@ -66,10 +66,22 @@
             <h1 class="text-center bg-primary text-white p-1 mt-2 rounded">
                 <i class="fas fa-tachometer-alt me-1"></i> DASHBOARD
             </h1>
-
+            <h1 class="h5 text-center bg-dark text-white p-1 mt-0 rounded">
+                 <i> Métricas Gerais </i>
+            </h1>
             <!-- Texto e Gráfico de Linhas -->
             <i class="bg-primary text-black p-2 rounded text-center">Máximo e minímo de containers por dia</i>
-            <canvas class="w-100 border-5 rounded p-2 border-primary mb-2" id="max_min_day" height="280" style="border: solid;"></canvas>
+            <canvas id="max_min_day" class="w-100 border-5 rounded p-2 border-primary mb-2" height="280" style="border: solid;"></canvas>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <canvas id="active_connections" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <canvas id="rps_host" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
+                </div>
+            </div>
+
 
             <!-- Passar dados para o gráfico -->
             <script id="mmd_data" type="application/json">
@@ -79,6 +91,27 @@
                     "max_container_counts": {{ max_container_counts|safe }}
                 }
             </script>
+
+            <script id="active_connections_data" type="application/json">
+                {
+                    "dates": {{ dates|safe }},
+                    "min_container_counts": {{ min_container_counts|safe }},
+                    "max_container_counts": {{ max_container_counts|safe }}
+                }
+            </script>
+
+            <script id="rps_host_data" type="application/json">
+                {
+                    "dates": {{ dates|safe }},
+                    "min_container_counts": {{ min_container_counts|safe }},
+                    "max_container_counts": {{ max_container_counts|safe }}
+                }
+            </script>
+
+
+
+
+
 
             <script id="cpu_data" type="application/json">
                 {
@@ -121,22 +154,11 @@
                     "rps": {{ rps|safe }}
                 }
             </script>
-
-            <script id="upstream_response_time_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "urt": {{ urt|safe }}
-                }
-            </script>
-
-            <script id="request_time_data" type="application/json">
-                {
-                    "container_names": {{ container_names|safe }},
-                    "rt": {{ rt|safe }}
-                }
-            </script>
             <!-- Layout com gráfico de barras alinhado à esquerda -->
             <!-- Ajustar a estrutura da área que contém os gráficos e a barra lateral -->
+            <h1 class="h5 text-center bg-dark text-white p-1 mt-0 rounded">
+                 <i> Containers Upstream</i>
+            </h1>
             <div class="row">
                 <div class="col-md-6 mb-2">
                     <canvas id="cpu" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
@@ -160,14 +182,6 @@
 
                 <div class="col-md-6 mb-2">
                     <canvas id="rps" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="upstream_response_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                    <canvas id="request_time" class="border-primary border-5 rounded w-100" style="height: 250px; border: solid;"></canvas>
                 </div>
             </div>
         </div>

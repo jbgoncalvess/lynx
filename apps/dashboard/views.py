@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.api.models import HostCurrentCount, HostDailyMaxMin, ContainerMetrics
+from apps.api.models import HostContainersConnections, HostDailyMaxMin, ContainerMetrics
 import json
 import re
 
@@ -8,16 +8,16 @@ import re
 @login_required
 def dashboard_view(request):
     # Obtém o último registro de containers ativos
-    latest_record = HostCurrentCount.objects.order_by('-time').values('active_containers', 'active_connections').first()
+    latest_record = HostContainersConnections.objects.order_by('-time').values('active_containers', 'active_connections').first()
     active_containers = latest_record['active_containers']
     active_connections = latest_record['active_connections']
 
     # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros (26/08 - 25/08 ..)
-    daily_max_min = HostDailyMaxMin.objects.order_by('-date')[:7]
+    daily_max_min = HostDailyMaxMin.objects.order_by('-time')[:7]
     daily_max_min = daily_max_min[::-1]
 
     # Formata as datas e valores de containers para o gráfico
-    dates = [entry.date.strftime('%d/%m') for entry in daily_max_min]  # Formata a data como 'dia/mês'
+    dates = [entry.time.strftime('%d/%m') for entry in daily_max_min]  # Formata a data como 'dia/mês'
     max_container_counts = [entry.max_containers for entry in daily_max_min]
     min_container_counts = [entry.min_containers for entry in daily_max_min]
 
