@@ -75,7 +75,7 @@ def resolv_ip_name(requests_count):
             return sum(sublist) / len(sublist)
         return 0
 
-    # Para cada IP de container, verifico se ele recebeu uma atribuição de rps
+    # Para cada IP de container, verifico se ele recebeu uma atribuição de requests
     for container_ip in container_ips:
         # Adiciona o valor de requests_count correspondente ou '0' se não encontrar o IP
         rps.append(str(requests_count.get(container_ip + ":80", {}).get('count', 0)))
@@ -169,11 +169,11 @@ def metrics_collect():
         rps_urt_rt = metrics_log(log_file)
         print(f'TESTANDOOOOOOOOOOOO: {rps_urt_rt}')
         if rps_urt_rt == None:
-            # Se o arquivo de log está vazio (rotate aconteceu no momento ou ninguem ta acessando o servidor mesmo, eu adiciono 0 que indica que sem métricas de rps, urt rt)
+            # Se o arquivo de log está vazio (rotate aconteceu no momento ou ninguem ta acessando o servidor mesmo, eu adiciono 0 que indica que sem métricas de requests, urt rt)
             rps = '0'
             urt = '0'
             rt = '0'
-            # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (rps)
+            # Inserir manualmente métricas que não consigo diretamente do lxc list (uptime) e do (requests)
             for n in range(len(linhas)):
                 linhas[n] = linhas[n] + ',' + get_uptime(linhas[n].split(',')[0]) + ',' + rps + ',' + urt + ',' + rt
         else:
@@ -212,7 +212,7 @@ def metrics_collect():
                     'disk_usage': disk_usage,  # Uso do disco
                     'uptime': uptime,  # Tempo ativo do container
                     'processes': processes,
-                    'rps': rps,
+                    'requests': rps,
                     'urt': urt,
                     'rt': rt
                 }

@@ -1,19 +1,34 @@
 from django.db import models
 from django.utils import timezone
+from django.db.models import JSONField
 
 
 # Model para armazenar o número de containers ativos
-class CurrentCount(models.Model):
-    # Campo para armazenar o número de containers ativos no momento
-    container_count = models.IntegerField(default=0)
+class HostCurrentCount(models.Model):
+    # Armazenar o número de containers ativos no momento e o número de conexões ativas no momento para o servidor host
+    active_containers = models.IntegerField(default=0)
+    active_connections = models.IntegerField(default=0)
+
+    # Lista de 3 elementos para calcular o requests
+    requests = JSONField(default=list, blank=True, null=True)
     time = models.DateTimeField(default=timezone.now)
 
+    def add_request(self, new_request):
+        self.requests.append(new_request)
+        # Limita a lista ao tamanho máximo de 3 valores
+        if len(self.requests) > 3:
+            self.requests.pop(0)
+        # Salva a instância atualizada no banco de dados
+        self.save()
+
     def __str__(self):
-        return f"{self.container_count} containers ativos em {self.time}"
+        return (f"{self.active_containers} containers ativos em {self.time} | "
+                f"Conexões ativas: {self.active_connections} | "
+                f"RPS: {self.requests}")
 
 
 # Model para armazenar os valores máximos e mínimos por data
-class DailyMaxMin(models.Model):
+class HostDailyMaxMin(models.Model):
     date = models.DateField(unique=True)
     max_containers = models.IntegerField(default=0)
     min_containers = models.IntegerField(default=0)
@@ -33,15 +48,19 @@ class ContainerMetrics(models.Model):
     disk_usage = models.FloatField(default=0)
     uptime = models.IntegerField(default=0)
     processes = models.IntegerField(default=0)
-    rps = models.FloatField(default=0)
-    urt = models.FloatField(default=0)
-    rt = models.FloatField(default=0)
+    requests_c = JSONField(default=list, blank=True, null=True)
+
+    def add_request_c(self, new_request):
+        self.requests_c.append(new_request)
+        if len(self.requests_c) > 3:
+            self.requests_c.pop(0)
+        self.save()
 
     def __str__(self):
         return (f"Container {self.container_name} - {self.time} - {self.active}"
                 f" - CPU: {self.cpu_usage} - RAM: {self.ram_usage}"
                 f" - Disco: {self.disk_usage} - Uptime: {self.uptime} - Processos: {self.processes}"
-                f" - RPS: {self.rps} - URT: {self.urt} - RT: {self.rt}")
+                f" - Request_container = {self.requests_c}")
 
 
 # Model para armazenar o nome dos containers e seus status

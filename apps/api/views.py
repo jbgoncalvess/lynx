@@ -2,19 +2,19 @@ from datetime import timedelta
 import locale
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import CurrentCount, DailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP, ContainerLxcImage
+from .models import HostCurrentCount, HostDailyMaxMin, ContainerMetrics, ContainerLxcList, ContainerIP, ContainerLxcImage
 from django.utils import timezone
 import json
 import re
 from django.conf import settings
 
 
-def current_containers(container_count):
+def host_metrics(active_containers, active_connections, rps):
     # Adiciona um novo registro na tabela ContainerStatus (time é adiciona o atual do Br)
-    CurrentCount.objects.create(container_count=container_count)
+    HostCurrentCount.objects.create(container_count=active_containers, active_connections=active_connections, rps=rps)
     # Manter apenas os últimos 3 registros de containers ativos para não acumular lixo
-    if CurrentCount.objects.count() > 3:
-        oldest_entry = CurrentCount.objects.order_by('time').first()
+    if HostCurrentCount.objects.count() > 3:
+        oldest_entry = HostCurrentCount.objects.order_by('time').first()
         oldest_entry.delete()
 
 
@@ -22,7 +22,7 @@ def max_min_containers(container_count):
     # Adicionar a data atual, pegando somente o ANO/MES/DIA
     current_date = timezone.localtime().date()
     # Verifico se tem algum registro nesse dia
-    existing_entry = DailyMaxMin.objects.filter(date=current_date).first()
+    existing_entry = HostDailyMaxMin.objects.filter(date=current_date).first()
 
     # Se tiver registro, eu verifico se é o maior ou o menor do dia, só pode ser os dois se a tabela não existir
     # para aquele dia
@@ -37,15 +37,15 @@ def max_min_containers(container_count):
 
     # Se não tiver registro, eu crio um novo com o valor que chegou, tanto para Min quanto para Max
     else:
-        DailyMaxMin.objects.create(
+        HostDailyMaxMin.objects.create(
             date=current_date,
             max_containers=container_count,
             min_containers=container_count,
         )
 
     # Mantém no máximo 90 dias de registros
-    if DailyMaxMin.objects.count() > 90:
-        oldest_entry = DailyMaxMin.objects.order_by('date').first()
+    if HostDailyMaxMin.objects.count() > 90:
+        oldest_entry = HostDailyMaxMin.objects.order_by('date').first()
         oldest_entry.delete()
 
 
@@ -116,6 +116,8 @@ def lxc_list(request):
             return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
     else:
         return JsonResponse({"error": "Método não permitido."}, status=405)
+
+
 #######################################################################################################################
 
 
@@ -179,25 +181,34 @@ def lxc_image(request):
             return JsonResponse({"error": f"Erro interno: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Método não permitido."}, status=405)
+
+
 #######################################################################################################################
 
 
 #######################################################################################################################
 @csrf_exempt
-def metrics_containers(request):
+def metrics(request):
     if request.method == 'POST':
         client_auth = request.headers.get('Authorization')
         if client_auth != f'Token {settings.AUTH_TOKEN}':
             return JsonResponse({"error": "Não autorizado"}, status=401)
         try:
             data = json.loads(request.body)
-            containers_metrics = data.get('metrics_containers', [])
             active_containers = data.get('active_containers', 0)
+            active_connections = data.get('active_connections', 0)
+            request = data.get('request', 0)
+            containers_metrics = data.get('metrics_containers', [])
 
             container_names = {container_data.get('name') for container_data in containers_metrics}
             ContainerMetrics.objects.exclude(container_name__in=container_names).delete()
 
-            current_containers(active_containers)
+            # Número de containers ativos, conexões ativas no servidor e requisições feitas por segundo
+            host, created = HostCurrentCount.objects.get_or_create(id=1)
+            host.active_containers = active_containers
+            host.active_connections = active_connections
+            host.add_request(request)
+
             max_min_containers(active_containers)
 
             container_names = []
@@ -211,16 +222,14 @@ def metrics_containers(request):
                 disk_usage = container['disk_usage']
                 uptime = container['uptime']
                 processes = container['processes']
-                rps = container['rps']
-                urt = container['urt']
-                rt = container['rt']
+                request_c = container['request_c']
 
                 print(f"NOME: {container_names[-1]}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}"
-                      f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime}, PROCESSES: {processes}, RPS: {rps}, URT: {urt}, "
-                      f" RT: {rt}.")
+                      f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime}, PROCESSES: {processes}, REQUESTS_C: {request_c}")
 
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
-
+                print('TESTANDO-123')
+                print(request_c)
                 if existing_entry:
                     existing_entry.time = timezone.localtime()
                     existing_entry.active = True
@@ -229,9 +238,8 @@ def metrics_containers(request):
                     existing_entry.disk_usage = disk_usage
                     existing_entry.uptime = uptime
                     existing_entry.processes = processes
-                    existing_entry.rps = rps
-                    existing_entry.urt = urt
-                    existing_entry.rt = rt
+                    existing_entry.add_request_c(request_c)
+                    print(request_c)
                     existing_entry.save()
                 else:
                     ContainerMetrics.objects.create(
@@ -241,10 +249,14 @@ def metrics_containers(request):
                         disk_usage=disk_usage,
                         uptime=uptime,
                         processes=processes,
-                        rps=rps,
-                        urt=urt,
-                        rt=rt,
+                        requests_c=[request_c]
                     )
+
+            host = HostCurrentCount.objects.all()
+            print(host)
+
+            container = ContainerMetrics.objects.all()
+            print(container)
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
              .update(active=False))

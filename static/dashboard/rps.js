@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const rps = document.getElementById('rps_data');
     const data = JSON.parse(rps.textContent);
-    const ctx = document.getElementById('rps').getContext('2d');
+    const ctx = document.getElementById('requests').getContext('2d');
     // Configurações do gráfico de barras
     const rps_graph = new Chart(ctx, {
         type: 'bar',

@@ -113,5 +113,5 @@ def enviar_dados():
 # Loop infinito para enviar os dados a cada 30 segundos
 while True:
     enviar_dados()
-    time.sleep(30)  # Aguarda 30 segundos antes de executar novamente
+    time.sleep(15)  # Aguarda 30 segundos antes de executar novamente
 

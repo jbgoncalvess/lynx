@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.api.models import CurrentCount, DailyMaxMin, ContainerMetrics
+from apps.api.models import HostCurrentCount, HostDailyMaxMin, ContainerMetrics
 import json
 import re
 
@@ -8,10 +8,12 @@ import re
 @login_required
 def dashboard_view(request):
     # Obtém o último registro de containers ativos
-    ult_reg = CurrentCount.objects.order_by('-time').first()
+    latest_record = HostCurrentCount.objects.order_by('-time').values('active_containers', 'active_connections').first()
+    active_containers = latest_record['active_containers']
+    active_connections = latest_record['active_connections']
 
     # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros (26/08 - 25/08 ..)
-    daily_max_min = DailyMaxMin.objects.order_by('-date')[:7]
+    daily_max_min = HostDailyMaxMin.objects.order_by('-date')[:7]
     daily_max_min = daily_max_min[::-1]
 
     # Formata as datas e valores de containers para o gráfico
@@ -36,9 +38,7 @@ def dashboard_view(request):
     disk_usages = [container.disk_usage for container in container_metrics]
     uptime = [container.uptime for container in container_metrics]
     processes = [container.processes for container in container_metrics]
-    rps = [container.rps for container in container_metrics]
-    urt = [container.urt for container in container_metrics]
-    rt = [container.rt for container in container_metrics]
+    request_c = [container.requests_c for container in container_metrics]
 
     # Passar vetor de string para o front-end js preciso converter com json.dumps
     # Inteiros não preciso converter
@@ -47,7 +47,8 @@ def dashboard_view(request):
 
     # Envia os dados como uma variável de contexto para o modelo
     return render(request, 'dashboard/dashboard.html', {
-        'ult_reg': ult_reg,
+        'active_containers': active_containers,
+        'active_connections': active_connections,
 
         'dates': dates,
         'max_container_counts': max_container_counts,
@@ -60,7 +61,5 @@ def dashboard_view(request):
         'disk_usages': disk_usages,
         'uptime': uptime,
         'processes': processes,
-        'rps': rps,
-        'urt': urt,
-        'rt': rt
+        'requests_c': request_c
     })

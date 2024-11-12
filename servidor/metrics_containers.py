@@ -4,7 +4,7 @@ import subprocess
 import time
 
 # URL da API onde os dados serão enviados
-url = 'http://192.168.77.1:8000/api/metrics_containers/'
+url = 'http://192.168.77.1:8000/api/metrics/'
 
 
 def contar_containers_ativos():
@@ -16,7 +16,7 @@ def contar_containers_ativos():
         return active_count
     except Exception as e:
         print(f"Erro ao contar containers: {e}")
-        return 0
+        return None
 
 
 # Função para coletar o uso de CPU de um container
@@ -83,7 +83,7 @@ def get_uptime(container_name):
 
 
 def get_active_connections():
-    # Usa curl para acessar o endpoint do stub_status
+    # Usar curl para acessar o endpoint do stub_status
     try:
         command = "curl -s http://localhost/nginx_status | grep 'Active connections:' | awk '{print $3}'"
         result = subprocess.check_output(command, shell=True)
@@ -174,9 +174,10 @@ def send_metrics():
     data = {
         'active_containers': active_containers,
         'active_connections': active_connections,
-        'requests': request,
+        'request': request,
         'metrics_containers': metrics_containers
     }
+
     print("Dados do servidor host (balanceador):")
     print(f"active_containers: {active_containers}| active_connections: {active_connections}| requests: {request}")
 
@@ -197,7 +198,7 @@ def send_metrics():
         'Content-Type': 'application/json',
         'Authorization': 'Token f8a024c16665a99d561940c16712ea349351c3a6302650f2b3175b98282c30e9'
     }
-    exit(0)
+
     try:
         response = requests.post(url, data=json.dumps(data), headers=headers)
         if response.status_code == 200:
