@@ -16,19 +16,17 @@ def dashboard_view(request):
     times_active_connections = []
     active_connections = []
     for record in time_active_connections:
-        time = record['time'].strftime('%H:%M')
+        time = record['time'].strftime('%H:%M:%S')
         times_active_connections.append(time)
 
         active_connections.append(record['active_connections'])
-
-
 
     # Obter as 15 requisições diminuir a i da i-1, somar i as suas tres vizinhas e dividir pelo número de segundos que
     # chega cada requisição, assim tenho o rps do host (balanceador)
     host_rps = HostRps.objects.order_by('time').values_list('requests', flat=True)[:15]
     # Capturar o tempo a cada 3, pois eu uso 3 valores do Host_rps para formar 1, que é RPS. Converter para HORA:MINUTO
     time_host_rps = HostRps.objects.order_by('time').values_list('time', flat=True)[2::3]
-    times_host_rps = [time.strftime('%H:%M') for time in time_host_rps]
+    times_host_rps = [time.strftime('%H:%M:%S') for time in time_host_rps]
 
     # Após diminuir i de i-1 e salvar
     # request_geral = [2, 2, 1, 2, 1, 1, 9, 4, 21, 7, 5, 7, 2, 4, 2]
@@ -39,7 +37,7 @@ def dashboard_view(request):
     # O quinto valor será a soma dos próximos 3 elementos: 2 + 4 + 2 = 8
     rps_host = []
     if host_rps:
-        request_geral = [host_rps[0]]
+        request_geral = [host_rps[1]-host_rps[0]]
         for i in range(1, len(host_rps)):
             request_geral.append(host_rps[i] - host_rps[i - 1])
 
@@ -50,7 +48,7 @@ def dashboard_view(request):
     # ele nao coleta na base de dados
     if len(times_host_rps) < len(host_rps):
         time_extra = HostRps.objects.latest('time')
-        time_extra = time_extra.time.strftime('%H:%M')
+        time_extra = time_extra.time.strftime('%H:%M:%S')
         times_host_rps.append(time_extra)
     print(times_host_rps)
 
@@ -96,11 +94,19 @@ def dashboard_view(request):
     dates = json.dumps(dates)
     container_names = json.dumps(container_names)
 
+    times_active_connections = json.dumps(times_active_connections)
+
+    times_host_rps = json.dumps(times_host_rps)
+
+    print('TESTES')
+    print(times_host_rps)
+    print(rps_host)
+
     # Envia os dados como uma variável de contexto para o modelo
     return render(request, 'dashboard/dashboard.html', {
         'active_containers': active_containers,
         'active_connections': active_connections,  # NOVO ADD LOGO MAIS
-        'time_active_connections': time_active_connections,  # NOVO ADD LOGO MAIS
+        'time_active_connections': times_active_connections,  # NOVO ADD LOGO MAIS
 
         'rps_host': rps_host,
         'times_host_rps': times_host_rps,

@@ -94,17 +94,15 @@
 
             <script id="active_connections_data" type="application/json">
                 {
-                    "dates": {{ dates|safe }},
-                    "min_container_counts": {{ min_container_counts|safe }},
-                    "max_container_counts": {{ max_container_counts|safe }}
+                    "time_active_connections": {{ time_active_connections|safe }},
+                    "active_connections": {{ active_connections|safe }}
                 }
             </script>
 
             <script id="rps_host_data" type="application/json">
                 {
-                    "dates": {{ dates|safe }},
-                    "min_container_counts": {{ min_container_counts|safe }},
-                    "max_container_counts": {{ max_container_counts|safe }}
+                    "times_host_rps": {{ times_host_rps|safe }},
+                    "rps_host": {{ rps_host|safe }}
                 }
             </script>
 
@@ -148,10 +146,10 @@
                 }
             </script>
 
-            <script id="rps_data" type="application/json">
+            <script id="rps_containers_data" type="application/json">
                 {
                     "container_names": {{ container_names|safe }},
-                    "rps": {{ rps|safe }}
+                    "rps_containers": {{ rps_containers|safe }}
                 }
             </script>
             <!-- Layout com gráfico de barras alinhado à esquerda -->
@@ -193,9 +191,9 @@
         <script src="{% static 'dashboard/disk.js' %}"></script>
         <script src="{% static 'dashboard/uptime.js' %}"></script>
         <script src="{% static 'dashboard/processes.js' %}"></script>
-        <script src="{% static 'dashboard/rps.js' %}"></script>
-        <script src="{% static 'dashboard/upstream_response_time.js' %}"></script>
-        <script src="{% static 'dashboard/request_time.js' %}"></script>
+        <script src="{% static 'dashboard/rps_containers.js' %}"></script>
+        <script src="{% static 'dashboard/rps_host.js' %}"></script>
+        <script src="{% static 'dashboard/active_connections.js' %}"></script>
 
     </main>
 

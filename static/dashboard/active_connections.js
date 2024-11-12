@@ -1,32 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Receber os dados transformados do HTML, que por sua vez recebeu da View
-  const mmd = document.getElementById('mmd_data');
-  const data = JSON.parse(mmd.textContent);
-  const ctx = document.getElementById("max_min_day");
+  const acd = document.getElementById('active_connections_data');
+  const data = JSON.parse(acd.textContent);
+  const ctx = document.getElementById("active_connections");
 
   const myChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: data.dates,
+      labels: data.time_active_connections,  // eixo X: Horas e minutos
       datasets: [
         {
-          label: 'Mínimo de Containers',
-          data: data.min_container_counts,  // Dados de contêineres mínimos
-          lineTension: 0,
-          backgroundColor: "transparent",
-          borderColor: "#ff0000",  // Cor da linha para o mínimo
-          borderWidth: 2,
-          pointBackgroundColor: "#ff0000",
-        },
-        {
-          label: 'Máximo de Containers',
-          data: data.max_container_counts,  // Dados de contêineres máximos
-          lineTension: 0,
-          backgroundColor: "transparent",
+          label: 'Volume de Conexões Ativas',
+          data: data.active_connections,  // Dados do volume de conexões
+          lineTension: 0.3,
+          backgroundColor: "rgba(0, 123, 255, 0.5)",  // Preenchimento do gráfico de área
           borderColor: "#007bff",
-          borderWidth: 3,
+          borderWidth: 2,
           pointBackgroundColor: "#007bff",
-        },
+          fill: true,  // Ativa o preenchimento abaixo da linha
+        }
       ],
     },
     options: {
@@ -39,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           ticks: {
             color: "rgba(14,14,14,0.9)",
-            stepSize: 1,
+            stepSize: 5,
           },
         },
         x: {
@@ -53,14 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       plugins: {
         legend: {
-          display: true,  // Exibe a legenda
-          position: 'top',  // Posição da legenda ('top', 'bottom', 'left', 'right')
+          display: true,
+          position: 'top',
           labels: {
-            color: '#000',  // Cor do texto da legenda
+            color: '#000',
             font: {
-              size: 13,  // Tamanho da fonte
+              size: 13,
             },
-            boxWidth: 10,  // Largura da caixa de cor da legenda
+            boxWidth: 10,
           },
         },
         tooltip: {
@@ -75,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           callbacks: {
             label: function (context) {
-              return '  ' + context.raw + ' Containers';
+              return '  ' + context.raw + ' Conexões';
             }
           },
         },

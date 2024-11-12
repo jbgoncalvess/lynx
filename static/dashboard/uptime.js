@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 label: 'Uptime (Minutos)',
                 data: data.uptime,  // Exemplo de dados
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
-                borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
+                backgroundColor: "rgba(0, 123, 255, 0.5)",  // Preenchimento do gráfico de área
+                borderColor: "#007bff",
                 borderWidth: 2
             }]
         },

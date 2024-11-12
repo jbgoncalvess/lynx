@@ -1,8 +1,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const rps = document.getElementById('rps_data');
+    const rps = document.getElementById('rps_containers_data');
     const data = JSON.parse(rps.textContent);
-    const ctx = document.getElementById('requests').getContext('2d');
+    const ctx = document.getElementById('rps').getContext('2d');
     // Configurações do gráfico de barras
     const rps_graph = new Chart(ctx, {
         type: 'bar',
@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
             labels: data.container_names, // Exemplo de meses
             datasets: [{
                 label: 'Requisições por Segundo (RPS)',
-                data: data.rps,  // Exemplo de dados
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',  // Cor das barras
-                borderColor: 'rgba(54, 162, 235, 1)',  // Cor da borda das barras
+                data: data.rps_containers,  // Exemplo de dados
+                backgroundColor: "rgba(0, 123, 255, 0.5)",  // Preenchimento do gráfico de área
+                borderColor: "#007bff",
                 borderWidth: 2
             }]
         },
