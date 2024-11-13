@@ -1,4 +1,5 @@
 from apps.containers.views import create_client_ssh
+from apps.api.models import ContainerLxcImage
 
 
 # Função para atualizar os containers upstream de acordo com seus status
@@ -44,4 +45,39 @@ def update_upstream(containers_running):
 
     finally:
         # Fecha a conexão SSH
+        ssh_client.close()
+
+
+def update_containers():
+    # Criar o client SSH
+    ssh_client = create_client_ssh()
+    # Caminho para o arquivo .yaml local
+    local_path = 'static/nginx/containers.yaml'
+    # Caminho para o arquivo.yaml do software
+    server_path = '/home/lynx/yaml/containers.yaml'
+    # última imagem disponível
+    image = ContainerLxcImage.objects.order_by('-upload_date').first()
+    if image:
+        image_name = image.image_name  # Acessa o nome da imagem da última instância
+        print(f"Última imagem: {image_name}")
+    else:
+        print("Nenhuma imagem encontrada.")
+        return
+
+    try:
+        sftp_client = ssh_client.open_sftp()
+        sftp_client.put(local_path, server_path)  # Fazendo upload
+        sftp_client.close()
+
+        command = f"lxc launch {image_name} < {server_path}"
+        _, _, stderr = ssh_client.exec_command(command)
+        error = stderr.read().decode()
+        if error:
+            print(f"Erro ao executar o comando: {error}")
+        else:
+            print(f"Container criado com sucesso!")
+
+    except Exception as e:
+        print(f"Erro ao conectar via SSH: {str(e)}")
+    finally:
         ssh_client.close()

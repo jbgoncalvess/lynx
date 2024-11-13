@@ -1,6 +1,6 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from apps.api.models import ContainerLxcList, ContainerIP
+from apps.api.models import ContainerLxcList, ContainerIP, ContainerMetrics
 from apps.nginx.views import update_upstream
 
 
@@ -59,3 +59,21 @@ def update_upstream_ip(sender, instance, **kwargs):
         update_upstream(containers_running)
         # Flagzinha para caso ele ja tenha sido executado
         container._upstream_updated = True
+
+
+# Verificar o uso da CPU, se for >= 70, inicio outro container.
+@receiver(post_save, sender=ContainerMetrics)
+def check_cpu_usage(sender, instance, **kwargs):
+
+    # Obter todos os registros de CPU_USAGE
+    cpu_usages = ContainerMetrics.objects.values_list('cpu_usage', flat=True)
+
+    if cpu_usages:
+        # Calcular a média aritmética. Cada container só tem um cpu usage, portanto o número de items cpu_usage
+        # é o número dos containers ativos
+        total_cpu_usage = sum(cpu_usages)
+        num_containers = cpu_usages.count()
+        avg_cpu_usage = total_cpu_usage / num_containers
+
+        # Verifica se a média de uso de CPU é igual ou maior que 70%
+        # if avg_cpu_usage >= 70:

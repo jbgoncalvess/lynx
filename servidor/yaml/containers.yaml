@@ -1,0 +1,15 @@
+config:
+  limits.cpu: "1"
+  limits.cpu.allowance: 50%
+  limits.memory: 512MB
+  user.network_mode: "bridged"
+devices:
+  eth0:
+    nictype: bridged
+    parent: lxdbr0
+    type: nic
+  root:
+    path: /
+    pool: default
+    type: disk
+    size: 2GB
