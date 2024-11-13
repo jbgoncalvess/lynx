@@ -27,8 +27,8 @@ class HostRps(models.Model):
     time = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        # Verifica se o número de registros é maior ou igual a 15
-        if HostRps.objects.count() >= 15:
+        # Verifica se o número de registros é maior ou igual a 16
+        if HostRps.objects.count() >= 16:
             # Exclui o registro mais antigo (com menor 'time')
             oldest_entry = HostRps.objects.order_by('time').first()
             oldest_entry.delete()
@@ -100,7 +100,7 @@ class ContainerMetrics(models.Model):
 
     def add_request_c(self, new_request):
         self.requests_c.append(new_request)
-        if len(self.requests_c) > 3:
+        if len(self.requests_c) > 4:
             self.requests_c.pop(0)
         self.save()
 

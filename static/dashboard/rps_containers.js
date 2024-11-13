@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scales: {
                 y: {
                     beginAtZero: true,  // Começar o eixo Y no zero
+                    min: 0,
                     grid: {
                         color: "rgba(14,14,14,0.8)",
                     },

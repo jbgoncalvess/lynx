@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from apps.api.models import HostContainersConnections, HostDailyMaxMin, ContainerMetrics, HostRps
 import json
 import re
+import pytz
 
 
 @login_required
@@ -15,18 +16,18 @@ def dashboard_view(request):
 
     times_active_connections = []
     active_connections = []
+    br = pytz.timezone("America/Sao_Paulo")
     for record in time_active_connections:
-        time = record['time'].strftime('%H:%M:%S')
+        time = record['time'].astimezone(br).strftime('%H:%M:%S')
         times_active_connections.append(time)
-
         active_connections.append(record['active_connections'])
 
-    # Obter as 15 requisições diminuir a i da i-1, somar i as suas tres vizinhas e dividir pelo número de segundos que
+    # Obter as 16 requisições diminuir a i da i-1, somar i as suas tres vizinhas e dividir pelo número de segundos que
     # chega cada requisição, assim tenho o rps do host (balanceador)
-    host_rps = HostRps.objects.order_by('time').values_list('requests', flat=True)[:15]
+    host_rps = HostRps.objects.order_by('time').values_list('requests', flat=True)[:16]
     # Capturar o tempo a cada 3, pois eu uso 3 valores do Host_rps para formar 1, que é RPS. Converter para HORA:MINUTO
     time_host_rps = HostRps.objects.order_by('time').values_list('time', flat=True)[2::3]
-    times_host_rps = [time.strftime('%H:%M:%S') for time in time_host_rps]
+    times_host_rps = [time.astimezone(br).strftime('%H:%M:%S') for time in time_host_rps]
 
     # Após diminuir i de i-1 e salvar
     # request_geral = [2, 2, 1, 2, 1, 1, 9, 4, 21, 7, 5, 7, 2, 4, 2]
@@ -36,17 +37,19 @@ def dashboard_view(request):
     # O quarto valor será a soma dos próximos 3 elementos: 7 + 5 + 7 = 19
     # O quinto valor será a soma dos próximos 3 elementos: 2 + 4 + 2 = 8
     rps_host = []
+    print(host_rps)
     if host_rps:
-        request_geral = [host_rps[1]-host_rps[0]]
+        request_geral = []
         for i in range(1, len(host_rps)):
             request_geral.append(host_rps[i] - host_rps[i - 1])
 
-        rps_host = [sum(request_geral[i:i + 3]) for i in range(0, len(request_geral), 3)]
-        print(rps_host)
+        # Eu divido por 30, pois minha api pega os valores a cada dez segundos, e eu calculo o rps com 3 ocorrências
+        # a cada dez segundos
+        rps_host = [int(sum(request_geral[i:i + 3]) / 30) for i in range(0, len(request_geral), 3)]
 
     # O times_host_rps pode ser menor que o host_rps, visto que se o numero de elementos de tempo nao for multiplo 3,
     # ele nao coleta na base de dados
-    if len(times_host_rps) < len(host_rps):
+    if len(times_host_rps) < len(rps_host):
         time_extra = HostRps.objects.latest('time')
         time_extra = time_extra.time.strftime('%H:%M:%S')
         times_host_rps.append(time_extra)
@@ -85,7 +88,7 @@ def dashboard_view(request):
         # Calculando as diferenças consecutivas
         diff = [sublist[i] - sublist[i - 1] for i in range(1, len(sublist))]
         # Somando as diferenças
-        rps_containers.append(sum(diff))
+        rps_containers.append(int(sum(diff) / 30))
 
     print("REQUESTS C")
     print(rps_containers)

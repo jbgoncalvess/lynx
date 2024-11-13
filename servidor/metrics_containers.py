@@ -211,4 +211,4 @@ def send_metrics():
 
 while True:
     send_metrics()
-    time.sleep(15)
+    time.sleep(10)
