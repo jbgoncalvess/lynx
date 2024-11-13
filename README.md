@@ -1,6 +1,6 @@
 # Lynx - Software de Gerenciamento de Servidores Web
 
-Bem-vindo ao Lynx, um software web de gerenciamento de servidores que permite a administração simplificada de containers, imagens e balanceamento de carga em ambientes Nginx, que utilizam virtualização LXC/LXD. Este projeto foi desenvolvido utilizando Django e MDB-Bootstrap para criar uma interface amigável e responsiva.
+Bem-vindo ao Lynx, um software web de gerenciamento de servidores que permite a administração simplificada de containers, imagens e balanceamento de carga em ambientes Nginx, que utilizam virtualização LXC/LXD. Este projeto foi desenvolvido utilizando Django e MDBootstrap para criar uma interface amigável e responsiva.
 
 ## Funcionalidades
 
@@ -21,7 +21,7 @@ O projeto é dividido em vários apps Django, cada um focado em uma funcionalida
 ## Tecnologias Utilizadas
 
 - **Django:** Framework web utilizado para o backend e gerenciamento de rotas.
-- **MDB-Bootstrap:** Utilizado para criar uma interface responsiva e moderna no frontend.
+- **MDBootstrap:** Utilizado para criar uma interface responsiva e moderna no frontend.
 - **LXC/LXD:** Ferramentas de virtualização para a criação e gerenciamento de containers atráves de linha de comando.
 
 ## Instalação
