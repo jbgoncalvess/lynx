@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from apps.api.models import ContainerLxcList, ContainerIP, ContainerMetrics
-from apps.nginx.views import update_upstream
+from apps.nginx.views import update_upstream, active_containers
 
 
 # Recebe qualquer alteração da tabela ContainerLxcList é pai de ContainerIP, então chama container IP automaticamente
@@ -76,4 +76,9 @@ def check_cpu_usage(sender, instance, **kwargs):
         avg_cpu_usage = total_cpu_usage / num_containers
 
         # Verifica se a média de uso de CPU é igual ou maior que 70%
-        # if avg_cpu_usage >= 70:
+        if avg_cpu_usage >= 70:
+            active_containers()
+
+        # Se a média for menor, para os containers de aplicação, limitando-se no mínimo 1
+        elif avg_cpu_usage <= 30:
+            stop_containers()

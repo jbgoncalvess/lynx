@@ -1,5 +1,5 @@
 from apps.containers.views import create_client_ssh
-from apps.api.models import ContainerLxcImage
+from apps.api.models import ContainerLxcImage, ContainerLxcList
 
 
 # Função para atualizar os containers upstream de acordo com seus status
@@ -48,36 +48,59 @@ def update_upstream(containers_running):
         ssh_client.close()
 
 
-def update_containers():
+def active_containers():
     # Criar o client SSH
     ssh_client = create_client_ssh()
     # Caminho para o arquivo .yaml local
     local_path = 'static/nginx/containers.yaml'
     # Caminho para o arquivo.yaml do software
     server_path = '/home/lynx/yaml/containers.yaml'
-    # última imagem disponível
-    image = ContainerLxcImage.objects.order_by('-upload_date').first()
-    if image:
-        image_name = image.image_name  # Acessa o nome da imagem da última instância
-        print(f"Última imagem: {image_name}")
-    else:
-        print("Nenhuma imagem encontrada.")
-        return
 
     try:
-        sftp_client = ssh_client.open_sftp()
-        sftp_client.put(local_path, server_path)  # Fazendo upload
-        sftp_client.close()
+        # Buscar o primeiro container com status 'STOPPED'
+        container_stopped = ContainerLxcList.objects.filter(status='STOPPED').first()
 
-        command = f"lxc launch {image_name} < {server_path}"
-        _, _, stderr = ssh_client.exec_command(command)
-        error = stderr.read().decode()
-        if error:
-            print(f"Erro ao executar o comando: {error}")
+        if container_stopped is not None:
+            container_name = container_stopped.container_name
+            # Comando para iniciar o container
+            command = f"lxc start {container_name}"
+            _, _, stderr = ssh_client.exec_command(command)
+            error = stderr.read().decode()
+            if error:
+                print(f"Erro ao executar o comando: {error}")
+            else:
+                print(f"Container {container_name} iniciado com sucesso!")
+
         else:
-            print(f"Container criado com sucesso!")
+            # Última imagem disponível
+            image = ContainerLxcImage.objects.order_by('-upload_date').first()
+            if image:
+                image_name = image.image_name  # Acessa o nome da imagem da última instância
+                print(f"Última imagem: {image_name}")
+
+                # Fazer upload do arquivo .yaml
+                sftp_client = ssh_client.open_sftp()
+                sftp_client.put(local_path, server_path)  # Fazendo upload
+                sftp_client.close()
+
+                # Comando para criar o novo container com a imagem
+                command = f"lxc launch {image_name} < {server_path}"
+                _, _, stderr = ssh_client.exec_command(command)
+                error = stderr.read().decode()
+                if error:
+                    print(f"Erro ao executar o comando: {error}")
+                else:
+                    print(f"Container criado com sucesso!")
+            else:
+                print("Nenhuma imagem encontrada.")
+                return
 
     except Exception as e:
         print(f"Erro ao conectar via SSH: {str(e)}")
+
     finally:
+        # Fechar a conexão SSH independentemente de ocorrer erro ou não
         ssh_client.close()
+
+
+def stop_containers():
