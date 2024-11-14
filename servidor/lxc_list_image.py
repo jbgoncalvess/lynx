@@ -1,7 +1,6 @@
 import subprocess
 import requests
 import json
-import time
 import csv
 from io import StringIO
 
@@ -72,7 +71,7 @@ def collect_lxc_image():
 
 
 # Função para enviar os dados para o software
-def enviar_dados():
+def send_lxc():
     # Coleta o número de containers ativos
 
     # Coleta os dados detalhados dos containers lxc_list e lxc_image_list
@@ -108,10 +107,4 @@ def enviar_dados():
             print(f"Erro ao enviar dados sobre lxc images. Status: {response.status_code}, Resposta: {response.text}")
     except requests.exceptions.RequestException as e:
         print(f"Erro de conexão: {e}")
-
-
-# Loop infinito para enviar os dados a cada 30 segundos
-while True:
-    enviar_dados()
-    time.sleep(15)  # Aguarda 30 segundos antes de executar novamente
 

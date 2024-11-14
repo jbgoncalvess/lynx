@@ -1,7 +1,6 @@
 import requests
 import json
 import subprocess
-import time
 
 # URL da API onde os dados serão enviados
 url = 'http://192.168.77.1:8000/api/metrics/'
@@ -208,8 +207,3 @@ def send_metrics():
             print(f"Erro ao enviar métricas. Status: {response.status_code}, Resposta: {response.text}")
     except requests.exceptions.RequestException as e:
         print(f"Erro de conexão: {e}")
-
-
-while True:
-    send_metrics()
-    time.sleep(15)
