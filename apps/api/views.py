@@ -7,6 +7,7 @@ from django.utils import timezone
 import json
 import re
 from django.conf import settings
+from apps.nginx.views import check_cpu_usage
 
 
 def host_metrics(active_containers, active_connections, rps):
@@ -184,6 +185,7 @@ def metrics(request):
             max_min = HostDailyMaxMin(max_containers=active_containers,min_containers=active_containers)
             max_min.update_or_create_record()
 
+            cpu_usage_values = []
             container_names = []
             # Itera sobre as métricas de cada container
             for container in containers_metrics:
@@ -200,9 +202,15 @@ def metrics(request):
                 print(f"NOME: {container_names[-1]}, CPU_USAGE:{cpu_usage} , RAM_USAGE:{ram_usage}"
                       f" , DISK_USAGE:{disk_usage}, UPTIME: {uptime}, PROCESSES: {processes}, REQUESTS_C: {request_c}")
 
+                cpu_usage_values.append(container['cpu_usage'])
+
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
                 print('TESTANDO-123')
                 print(request_c)
+
+
+
+
                 if existing_entry:
                     existing_entry.time = timezone.localtime()
                     existing_entry.active = True
@@ -224,6 +232,9 @@ def metrics(request):
                         processes=processes,
                         requests_c=[request_c]
                     )
+
+            # Chamar a função para verificar se a média aritmética de cpu_usage é maior que 70% ou menor
+            check_cpu_usage(cpu_usage_values)
 
             host = HostContainersConnections.objects.all()
             print(host)

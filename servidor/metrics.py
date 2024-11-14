@@ -15,7 +15,7 @@ def contar_containers_ativos():
         return active_count
     except Exception as e:
         print(f"Erro ao contar containers: {e}")
-        return None
+        return 0
 
 
 # Função para coletar o uso de CPU de um container

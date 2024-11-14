@@ -59,38 +59,3 @@ def update_upstream_ip(sender, instance, **kwargs):
         update_upstream(containers_running)
         # Flagzinha para caso ele ja tenha sido executado
         container._upstream_updated = True
-
-
-# Verificar o uso da CPU, se for >= 70, inicio outro container.
-@receiver(post_save, sender=ContainerMetrics)
-def check_cpu_usage(sender, instance, **kwargs):
-
-    print(f'=================================================================================================')
-    print(f'=================================================================================================')
-    print(f'=================================================================================================')
-    # Obter todos os registros de CPU_USAGE
-    cpu_usages = ContainerMetrics.objects.values_list('cpu_usage', flat=True)
-
-    if cpu_usages:
-        # Calcular a média aritmética. Cada container só tem um cpu usage, portanto o número de items cpu_usage
-        # é o número dos containers ativos
-        total_cpu_usage = sum(cpu_usages)
-        num_containers = cpu_usages.count()
-        avg_cpu_usage = total_cpu_usage / num_containers
-
-        print(f'=================================================================================================')
-        print(f'=================================================================================================')
-        print(f'=================================================================================================')
-        print(f'=================================================================================================')
-        print(f'=================================================================================================')
-        print(f'=================================================================================================')
-        print(f"{num_containers}")
-
-        # Verifica se a média de uso de CPU é igual ou maior que 70%
-        if avg_cpu_usage >= 70:
-            active_containers()
-
-        # Se a média for menor, para os containers de aplicação, limitando-se no mínimo 1
-
-        elif avg_cpu_usage <= 20 and num_containers > 1:
-            stop_containers()

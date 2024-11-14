@@ -83,12 +83,17 @@ def dashboard_view(request):
     processes = [container.processes for container in container_metrics]
     request_c = [container.requests_c for container in container_metrics]
 
+    # Correção do erro em que eu não considerava a lista das requests de cada container tendo um número diferente de 4
+    # Se tem 1 elemento, retorna ele. Se tem 2 elementos, retorna n+1 - n. Se tem 3, somatório de n+1 -n / 3. Etc.
     rps_containers = []
+    divisors = [0, 1, 10, 20, 30]
     for sublist in request_c:
-        # Calculando as diferenças consecutivas
-        diff = [sublist[i] - sublist[i - 1] for i in range(1, len(sublist))]
-        # Somando as diferenças
-        rps_containers.append(int(sum(diff) / 30))
+        n = len(sublist)
+        if n > 1:
+            diff = [sublist[i] - sublist[i - 1] for i in range(1, n)]
+            rps_containers.append(int(sum(diff) / divisors[n]))
+        elif n == 1:
+            rps_containers.append(0)
 
     print("REQUESTS C")
     print(rps_containers)
