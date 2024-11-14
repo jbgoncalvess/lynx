@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from apps.api.models import ContainerLxcList, ContainerIP, ContainerMetrics
-from apps.nginx.views import update_upstream, active_containers
+from apps.nginx.views import update_upstream, active_containers, stop_containers
 
 
 # Recebe qualquer alteração da tabela ContainerLxcList é pai de ContainerIP, então chama container IP automaticamente
@@ -65,6 +65,9 @@ def update_upstream_ip(sender, instance, **kwargs):
 @receiver(post_save, sender=ContainerMetrics)
 def check_cpu_usage(sender, instance, **kwargs):
 
+    print(f'=================================================================================================')
+    print(f'=================================================================================================')
+    print(f'=================================================================================================')
     # Obter todos os registros de CPU_USAGE
     cpu_usages = ContainerMetrics.objects.values_list('cpu_usage', flat=True)
 
@@ -75,10 +78,19 @@ def check_cpu_usage(sender, instance, **kwargs):
         num_containers = cpu_usages.count()
         avg_cpu_usage = total_cpu_usage / num_containers
 
+        print(f'=================================================================================================')
+        print(f'=================================================================================================')
+        print(f'=================================================================================================')
+        print(f'=================================================================================================')
+        print(f'=================================================================================================')
+        print(f'=================================================================================================')
+        print(f"{num_containers}")
+
         # Verifica se a média de uso de CPU é igual ou maior que 70%
         if avg_cpu_usage >= 70:
             active_containers()
 
         # Se a média for menor, para os containers de aplicação, limitando-se no mínimo 1
-        elif avg_cpu_usage <= 30:
+
+        elif avg_cpu_usage <= 20 and num_containers > 1:
             stop_containers()

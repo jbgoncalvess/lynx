@@ -1,5 +1,7 @@
 from apps.containers.views import create_client_ssh
 from apps.api.models import ContainerLxcImage, ContainerLxcList
+from apps.containers.views import natural_key
+import re
 
 
 # Função para atualizar os containers upstream de acordo com seus status
@@ -72,6 +74,25 @@ def active_containers():
                 print(f"Container {container_name} iniciado com sucesso!")
 
         else:
+            containers_order_name = sorted(ContainerLxcList.objects.filter(status='RUNNING'), key=natural_key)
+            containers = [container.container_name for container in containers_order_name]
+            container = containers[-1]
+            print(container)
+            new_container_name = ''
+            match = re.match(r"([a-zA-Z_-]+)(\d*)$", container)
+
+            if match:
+                name = match.group(1)  # Parte do prefixo (letras e underscore)
+                num = match.group(2)  # Parte numérica (vazia se não houver números)
+                print(name)
+                print(num)
+                if num:  # Se tem uma parte numérica
+                    num = int(num)
+                    new_num = num + 1
+                    new_container_name = f"{name}{new_num}"
+                else:
+                    new_container_name = f"{container}1"
+
             # Última imagem disponível
             image = ContainerLxcImage.objects.order_by('-upload_date').first()
             if image:
@@ -84,13 +105,13 @@ def active_containers():
                 sftp_client.close()
 
                 # Comando para criar o novo container com a imagem
-                command = f"lxc launch {image_name} < {server_path}"
+                command = f"lxc launch {image_name} {new_container_name} < {server_path}"
                 _, _, stderr = ssh_client.exec_command(command)
                 error = stderr.read().decode()
                 if error:
                     print(f"Erro ao executar o comando: {error}")
                 else:
-                    print(f"Container criado com sucesso!")
+                    print(f"Container {new_container_name} criado com sucesso!")
             else:
                 print("Nenhuma imagem encontrada.")
                 return
@@ -104,3 +125,25 @@ def active_containers():
 
 
 def stop_containers():
+    # Criar o client SSH
+    ssh_client = create_client_ssh()
+
+    try:
+        containers_order_name = sorted(ContainerLxcList.objects.filter(status='RUNNING'), key=natural_key)
+        containers = [container.container_name for container in containers_order_name]
+        command = f"lxc stop {containers[-1]}"
+        _, _, stderr = ssh_client.exec_command(command)
+        error = stderr.read().decode()
+        if error:
+            print(f"Erro ao executar o comando: {error}")
+        else:
+            print(f"Container {containers[-1]} parado com sucesso!")
+            container = ContainerLxcList.objects.filter(container_name=containers[-1]).first()
+            container.status = 'STOPPED'
+            container.save()
+
+    except Exception as e:
+        print(f"Erro ao conectar via SSH: {str(e)}")
+
+    finally:
+        ssh_client.close()
