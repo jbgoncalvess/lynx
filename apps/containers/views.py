@@ -86,7 +86,7 @@ def start_container(request, container_name):
                         ipaddress = stdout.read().decode().strip()
                         if error:
                             break
-                            time.sleep(3)
+                        time.sleep(3)
 
                     print(
                         f"=================================================================================================")
