@@ -7,7 +7,7 @@ from django.utils import timezone
 import json
 import re
 from django.conf import settings
-from apps.nginx.views import check_cpu_usage
+from apps.nginx.views import check_cpu_usage, update_upstream
 
 
 def host_metrics(active_containers, active_connections, rps):
@@ -78,6 +78,8 @@ def lxc_list(request):
                         ip_type='IPv6',
                     )
 
+            containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+            update_upstream(containers_running)
             return JsonResponse({"message": "Dados recebidos e salvos com sucesso."}, status=200)
 
         except json.JSONDecodeError:

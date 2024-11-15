@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.shortcuts import render
-from apps.api.models import ContainerLxcList, HostContainersConnections
+from apps.api.models import ContainerLxcList, HostContainersConnections, ContainerIP
+from apps.nginx.views import update_upstream
 
 
 def natural_key(container):
@@ -75,8 +76,37 @@ def start_container(request, container_name):
 
                 # Somente atualiza o status se não houver erros
                 if not error:
-                    container.status = 'RUNNING'
-                    container.save()
+                    command = f'lxc list {container_name} --format csv -c 4 | awk \'{{print $1}}\''
+                    _, stdout, stderr = client.exec_command(command)
+                    error = stderr.read().decode()
+                    ipaddress = stdout.read().decode().strip()
+                    while ipaddress == '':
+                        print(f"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                        _, stdout, stderr = client.exec_command(command)
+                        ipaddress = stdout.read().decode().strip()
+                        if error:
+                            break
+                            time.sleep(3)
+
+                    print(
+                        f"=================================================================================================")
+                    print(
+                        f"=================================================================================================")
+                    print(ipaddress)
+                    print(error)
+                    print(
+                        f"=================================================================================================")
+                    print(
+                        f"=================================================================================================")
+                    if not error and ipaddress:
+                        container.status = 'RUNNING'
+                        container.save()
+                        ipv4, created = ContainerIP.objects.get_or_create(container=container, ip_type='IPv4')
+                        ipv4.ip_address = ipaddress
+                        ipv4.save()
+                        # Chamo a função para atualizar o arquivo upstream do nginx
+                        containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+                        update_upstream(containers_running)
                     return JsonResponse({
                         'status': 'success',
                         'message': f'Container {container_name} iniciado com sucesso!'
@@ -122,6 +152,8 @@ def stop_container(request, container_name):
                 if not error:
                     container.status = 'STOPPED'
                     container.save()
+                    containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+                    update_upstream(containers_running)
                     return JsonResponse({
                         'status': 'success',
                         'message': f'Container {container_name} parado com sucesso!'
@@ -210,6 +242,14 @@ def swap_ip(request, container_name):
             error = stderr.read().decode()
 
             if not error:
+                container = ContainerLxcList.objects.get(container_name=container_name)
+                ipv4 = ContainerIP.objects.filter(container=container, ip_type='IPv4').first()
+                ipv4.ip_address = ipaddress
+                ipv4.save()
+                # Após buscar a instância do endereço IP, eu atualizo chamando update_upstream, que vai adicionar o novo
+                # endereço
+                containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+                update_upstream(containers_running)
                 return JsonResponse({'message': 'Endereço IPv4 trocado com sucesso!'})
             else:
                 return JsonResponse({'error': f'Erro ao adicionar o IPv4: {error}'})

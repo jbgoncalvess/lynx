@@ -1,7 +1,20 @@
-from apps.containers.views import create_client_ssh
 from apps.api.models import ContainerLxcImage, ContainerLxcList, ContainerMetrics
-from apps.containers.views import natural_key
 import re
+import paramiko
+
+
+def create_client_ssh():
+    ip_server = '192.168.77.2'
+    user_server = 'lynx'
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ip_server, username=user_server)
+    return client
+
+
+def natural_key(container):
+    return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', container.container_name)]
 
 
 # Função para atualizar os containers upstream de acordo com seus status
@@ -20,6 +33,8 @@ def update_upstream(containers_running):
         first_ipv4 = container.ips.filter(ip_type='IPv4').values_list('ip_address', flat=True).first()
         # Verificar se o endereço é válido, pois se meu daemon listar os ips dos containers, em um momento de
         # inicialização, virá sem endereço, ou seja, None
+        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+        print(first_ipv4)
         if first_ipv4:
             new_upstream += f"    server {first_ipv4};\n"
     new_upstream += '}\n'
@@ -65,10 +80,14 @@ def check_cpu_usage(cpu_usages):
         # Verifica se a média de uso de CPU é igual ou maior que 70%
         if avg_cpu_usage >= 70:
             active_containers()
+            containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+            update_upstream(containers_running)
 
         # Se a média for menor, para os containers de aplicação, limitando-se no mínimo 1
         elif avg_cpu_usage <= 20 and num_containers > 1:
             stop_containers()
+            containers_running = ContainerLxcList.objects.filter(status='RUNNING')
+            update_upstream(containers_running)
 
 
 def active_containers():
@@ -92,6 +111,8 @@ def active_containers():
             if error:
                 print(f"Erro ao executar o comando: {error}")
             else:
+                container_stopped.status = 'RUNNING'
+                container_stopped.save()
                 print(f"Container {container_name} iniciado com sucesso!")
 
         else:
@@ -132,6 +153,10 @@ def active_containers():
                 if error:
                     print(f"Erro ao executar o comando: {error}")
                 else:
+                    # Aqui eu poderia atualizar forçando a entrada do db e via ssh executando o comando para descobrir
+                    # o endereço ip, mas não faço isso, espero a próxima coleta e envio do servidor monitorado
+                    # container_stopped.status = 'RUNNING'
+                    # container_stopped.save()
                     print(f"Container {new_container_name} criado com sucesso!")
             else:
                 print("Nenhuma imagem encontrada.")
