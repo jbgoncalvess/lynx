@@ -4,7 +4,6 @@ import json
 import csv
 from io import StringIO
 
-
 url_lxc_list = 'http://192.168.77.1:8000/api/lxc_list/'
 url_lxc_image = 'http://192.168.77.1:8000/api/lxc_image/'
 
@@ -79,9 +78,9 @@ def send_lxc():
     containers_lxc_list = collect_lxc_list()
     containers_lxc_image = collect_lxc_image()
 
-    # print(containers_lxc_list)
-    # print('=' * 100)
-    # print(containers_lxc_image)
+    print(containers_lxc_list)
+    print('=' * 100)
+    print(containers_lxc_image)
 
     # Cabeçalhos para indicar que estamos enviando JSON
     headers = {

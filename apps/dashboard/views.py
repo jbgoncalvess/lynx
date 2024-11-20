@@ -37,7 +37,7 @@ def dashboard_view(request):
     # O quarto valor será a soma dos próximos 3 elementos: 7 + 5 + 7 = 19
     # O quinto valor será a soma dos próximos 3 elementos: 2 + 4 + 2 = 8
     rps_host = []
-    print(host_rps)
+    # print(host_rps)
     if host_rps:
         request_geral = []
         for i in range(1, len(host_rps)):
@@ -53,7 +53,7 @@ def dashboard_view(request):
         time_extra = HostRps.objects.latest('time')
         time_extra = time_extra.time.strftime('%H:%M:%S')
         times_host_rps.append(time_extra)
-    print(times_host_rps)
+    # print(times_host_rps)
 
     # Ordena as entradas pela data em ordem decrescente e pega os últimos 7 registros (26/08 - 25/08 ..)
     daily_max_min = HostDailyMaxMin.objects.order_by('-time')[:7]
@@ -95,8 +95,8 @@ def dashboard_view(request):
         elif n == 1:
             rps_containers.append(0)
 
-    print("REQUESTS C")
-    print(rps_containers)
+    # print("REQUESTS C")
+    # print(rps_containers)
     # Passar vetor de string para o front-end js preciso converter com json.dumps
     # Inteiros não preciso converter
     dates = json.dumps(dates)
@@ -106,9 +106,9 @@ def dashboard_view(request):
 
     times_host_rps = json.dumps(times_host_rps)
 
-    print('TESTES')
-    print(times_host_rps)
-    print(rps_host)
+    # print('TESTES')
+    # print(times_host_rps)
+    # print(rps_host)
 
     # Envia os dados como uma variável de contexto para o modelo
     return render(request, 'dashboard/dashboard.html', {

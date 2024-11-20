@@ -17,7 +17,7 @@ def natural_key(container):
 @login_required
 def containers_view(request):
     ult_reg = HostContainersConnections.objects.order_by('-time').first()
-    print(ult_reg)
+    # print(ult_reg)
     # Ordena os containers pelo nome
     containers = sorted(ContainerLxcList.objects.all(), key=natural_key)
 
@@ -39,7 +39,7 @@ def containers_view(request):
         # Adiciona o container e seus respectivos dados (nome, status, IPs) na lista
         container_data.append((container.container_name, container.status, ips_data))
 
-    print(container_data)
+    # print(container_data)
     # Envia os dados como contexto para o template
     return render(request, 'containers/containers.html', {
         'container_data': container_data,
@@ -81,23 +81,23 @@ def start_container(request, container_name):
                     error = stderr.read().decode()
                     ipaddress = stdout.read().decode().strip()
                     while ipaddress == '':
-                        print(f"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                        # print(f"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                         _, stdout, stderr = client.exec_command(command)
                         ipaddress = stdout.read().decode().strip()
                         if error:
                             break
                         time.sleep(3)
 
-                    print(
-                        f"=================================================================================================")
-                    print(
-                        f"=================================================================================================")
-                    print(ipaddress)
-                    print(error)
-                    print(
-                        f"=================================================================================================")
-                    print(
-                        f"=================================================================================================")
+                    # print(
+                    #     f"=================================================================================================")
+                    # print(
+                    #     f"=================================================================================================")
+                    # print(ipaddress)
+                    # print(error)
+                    # print(
+                    #     f"=================================================================================================")
+                    # print(
+                    #     f"=================================================================================================")
                     if not error and ipaddress:
                         container.status = 'RUNNING'
                         container.save()

@@ -182,6 +182,7 @@ def send_metrics():
 
     # Formatar os dados para debug, já que várias vezes eu enviei dados errados para o back
     print("Dados dos Containers:")
+    print(metrics_containers)
     for container in metrics_containers:
         print(f"Container: {container['name']:<3}| "
               f"CPU Usage: {container['cpu_usage']:<4}%| "

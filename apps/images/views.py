@@ -23,7 +23,7 @@ def images_view(request):
             'size': image.size,
             'upload_date': image.upload_date
         })
-        print(image.upload_date)
+        # print(image.upload_date)
 
     # Envia os dados como contexto para o modelo, para exibição
     return render(request, 'images/images.html', {

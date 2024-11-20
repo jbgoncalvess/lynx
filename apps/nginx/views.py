@@ -33,8 +33,8 @@ def update_upstream(containers_running):
         first_ipv4 = container.ips.filter(ip_type='IPv4').values_list('ip_address', flat=True).first()
         # Verificar se o endereço é válido, pois se meu daemon listar os ips dos containers, em um momento de
         # inicialização, virá sem endereço, ou seja, None
-        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
-        print(first_ipv4)
+        # print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+        # print(first_ipv4)
         if first_ipv4:
             new_upstream += f"    server {first_ipv4};\n"
     new_upstream += '}\n'
@@ -119,15 +119,15 @@ def active_containers():
             containers_order_name = sorted(ContainerLxcList.objects.filter(status='RUNNING'), key=natural_key)
             containers = [container.container_name for container in containers_order_name]
             container = containers[-1]
-            print(container)
+            # print(container)
             new_container_name = ''
             match = re.match(r"([a-zA-Z_-]+)(\d*)$", container)
 
             if match:
                 name = match.group(1)  # Parte do prefixo (letras e underscore)
                 num = match.group(2)  # Parte numérica (vazia se não houver números)
-                print(name)
-                print(num)
+                # print(name)
+                # print(num)
                 if num:  # Se tem uma parte numérica
                     num = int(num)
                     new_num = num + 1
@@ -139,7 +139,7 @@ def active_containers():
             image = ContainerLxcImage.objects.order_by('-upload_date').first()
             if image:
                 image_name = image.image_name  # Acessa o nome da imagem da última instância
-                print(f"Última imagem: {image_name}")
+                # print(f"Última imagem: {image_name}")
 
                 # Fazer upload do arquivo .yaml
                 sftp_client = ssh_client.open_sftp()

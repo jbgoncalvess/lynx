@@ -8,6 +8,8 @@
 	<title>Lynx Registro</title>
 	<link href="{% static 'bootstrap/mdb.min.css' %}" rel="stylesheet">
 	<link href="{% static 'contas/registro.css' %}" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'figuras/favicon.png' %}">
 </head>
 <body>
 	<section class="h-100 gradient-form">
@@ -19,7 +21,7 @@
 							<div class="col-lg-6">
 								<div class="card-body p-md-5 mx-md-4">
 									<div class="text-center">
-										<img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="250px" alt="">
+										<img src="{% static 'figuras/Lynx.png' %}" width="250px" alt="">
 									</div>
 									<form action="{% url 'registro' %}" method="post">
 										{% csrf_token %}
@@ -62,10 +64,10 @@
 							</div>
 							<div class="col-lg-6 d-flex align-items-center gradient-custom-2">
 								<div class="text-white px-3 py-4 p-md-5 mx-md-4">
-									<h4 class="mb-4">Bem-vindo à nossa plataforma</h4>
-									<p class="small mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-										tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-										exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+									<h3 class="mb-4 text-center title-large">Bem-vindo ao Lynx</h3>
+                                    <p class="small mb-0 fw-bold">
+                                        O Lynx é uma solução robusta e intuitiva projetada para monitorar e gerenciar containers LXC utilizados como containers de aplicação. Com uma interface amigável e funcionalidades avançadas, o Lynx oferece controle sobre o desempenho e a integridade de sua infraestrutura. Além disso, automatiza a gestão de containers upstream integrados ao Nginx, garantindo alta eficiência e disponibilidade para suas aplicações.
+                                    </p>
 								</div>
 							</div>
 						</div>

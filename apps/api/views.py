@@ -207,11 +207,8 @@ def metrics(request):
                 cpu_usage_values.append(container['cpu_usage'])
 
                 existing_entry = ContainerMetrics.objects.filter(container_name=container_names[-1]).first()
-                print('TESTANDO-123')
-                print(request_c)
-
-
-
+                # print('TESTANDO-123')
+                # print(request_c)
 
                 if existing_entry:
                     existing_entry.time = timezone.localtime()
@@ -222,7 +219,7 @@ def metrics(request):
                     existing_entry.uptime = uptime
                     existing_entry.processes = processes
                     existing_entry.add_request_c(request_c)
-                    print(request_c)
+                    # print(request_c)
                     existing_entry.save()
                 else:
                     ContainerMetrics.objects.create(
@@ -239,13 +236,13 @@ def metrics(request):
             check_cpu_usage(cpu_usage_values)
 
             host = HostContainersConnections.objects.all()
-            print(host)
+            # print(host)
 
             container = ContainerMetrics.objects.all()
-            print(container)
+            # print(container)
 
             rps = HostRps.objects.all()
-            print(rps)
+            # print(rps)
 
             (ContainerMetrics.objects.filter(active=True).exclude(container_name__in=container_names)
              .update(active=False))

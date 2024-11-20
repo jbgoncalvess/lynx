@@ -13,6 +13,8 @@
     <link href="{% static 'base/base.css' %}" rel="stylesheet">
     <!-- CSS personalizado para loading-overview -->
     <link href="{% static 'containers/loading_overlay.css' %}" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'figuras/favicon.png' %}">
 </head>
 
 
@@ -21,7 +23,7 @@
     <aside class="sidebar">
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white" style="width: 250px; height: 100vh;">
             <a href="{% url 'dashboard' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <img src="{% static 'figuras/LXC_Web_Lynx.png' %}" width="210" height="70" alt="">
+                <img src="{% static 'figuras/Lynx.png' %}" width="210" height="70" alt="">
             </a>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li>

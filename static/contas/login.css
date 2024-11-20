@@ -34,15 +34,6 @@ body {
   color: white;
 }
 
-.form-label {
-  color: #bbb;
-}
-
-.form-control {
-  background-color: #3a3a3a;
-  border: 1px solid #555;
-  color: #ddd;
-}
 
 .btn-primary {
   background: linear-gradient(to right, #0033ff, #3366ff, #3399ff, #66aaff);
