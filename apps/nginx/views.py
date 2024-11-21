@@ -124,8 +124,8 @@ def active_containers():
             match = re.match(r"([a-zA-Z_-]+)(\d*)$", container)
 
             if match:
-                name = match.group(1)  # Parte do prefixo (letras e underscore)
-                num = match.group(2)  # Parte numérica (vazia se não houver números)
+                name = match.group(1)  # Parte das letras
+                num = match.group(2)  # Parte numérica
                 # print(name)
                 # print(num)
                 if num:  # Se tem uma parte numérica
