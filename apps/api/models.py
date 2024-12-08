@@ -75,7 +75,7 @@ class HostDailyMaxMin(models.Model):
             )
 
         # Verifica se o número de registros é maior ou igual a 7
-        if HostDailyMaxMin.objects.count() >= 7:
+        if HostDailyMaxMin.objects.count() > 7:
             # Exclui o registro mais antigo (com menor 'time')
             oldest_entry = HostDailyMaxMin.objects.order_by('time').first()
             print(f"Excluindo o registro mais antigo: {oldest_entry.time}")
