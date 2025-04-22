@@ -1,12 +1,12 @@
-# Lynx - Software de Gerenciamento de Servidores Web 🚀
+# Lynx - Software de Gerenciamento de Servidores Web
 
 O **Lynx** é um software web robusto e eficiente, projetado para monitorar, gerenciar e automatizar servidores web que utilizam o **Nginx** como balanceador de carga para containers de aplicação upstream. Esses containers são executados com tecnologia **LXC/LXD** e também utilizam **Nginx** para gerenciar as requisições localmente. Desenvolvido com **Django** e **MDBootstrap**, o Lynx oferece uma interface moderna, responsiva e amigável, proporcionando controle completo sobre o ambiente de balanceamento e containers.
 
 ---
 
-## 🌟 Principais Funcionalidades
+## Principais Funcionalidades
 
-### 📈 Monitoramento de Servidores e Containers
+### Monitoramento de Servidores e Containers
 - **Desempenho do Servidor Host:**
   - Registro diário de valores máximos e mínimos de containers ativos nos últimos 7 dias.
   - Monitoramento em tempo real do número de conexões ativas e Requisições por Segundo (**RPS**), com histórico visual.
@@ -17,7 +17,7 @@ O **Lynx** é um software web robusto e eficiente, projetado para monitorar, ger
 
 ---
 
-### ⚙️ Gerenciamento de Containers
+### Gerenciamento de Containers
 - Controle completo dos containers upstream:
   - **Ações manuais:** iniciar, pausar e reiniciar containers.
   - Configuração de endereços IPv4 e gerenciamento de IPv6.
@@ -26,7 +26,7 @@ O **Lynx** é um software web robusto e eficiente, projetado para monitorar, ger
 
 ---
 
-### 🔄 Automação e Balanceamento de Carga
+### Automação e Balanceamento de Carga
 - **Configuração Automática do Nginx:**
   - Atualização em tempo real do arquivo de configuração do Nginx.
   - Containers em execução (**RUNNING**) são adicionados automaticamente ao balanceador de carga.
@@ -37,14 +37,14 @@ O **Lynx** é um software web robusto e eficiente, projetado para monitorar, ger
 
 ---
 
-### 🖼️ Gestão de Imagens
+### Gestão de Imagens
 - **Listagem de Imagens Disponíveis:**
   - Exibição detalhada de nome, arquitetura, descrição, tamanho e data de upload.
 - **Manutenção:** Exclusão de imagens desnecessárias para otimizar o armazenamento.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 ### No Lynx
 - **Python:** Base do backend, oferecendo automação e integração segura.
@@ -59,14 +59,14 @@ O **Lynx** é um software web robusto e eficiente, projetado para monitorar, ger
 
 ---
 
-## 📚 Bibliotecas-Chave
+## Bibliotecas-Chave
 
 - **Paramiko:** Gerenciamento seguro de conexões **SSH**, permitindo ao Lynx operar remotamente.
 - **Subprocess:** Execução de comandos no sistema operacional para gerenciamento de containers e reconfiguração do Nginx.
 
 ---
 
-## 🌐 Arquitetura e Diferenciais
+## Arquitetura e Diferenciais
 
 O **Lynx** foi projetado para operar remotamente, sem a necessidade de instalação no mesmo servidor que está sendo monitorado. Ele utiliza conexões **SSH** seguras para comunicação, coleta de métricas e execução de comandos.
 
